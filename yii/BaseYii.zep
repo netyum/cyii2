@@ -90,7 +90,7 @@ class BaseYii
      * @throws InvalidParamException if the alias is invalid while $throwException is true.
      * @see setAlias()
      */
-    public static function getAlias(alias, throwException = true)
+    public static function getAlias(string alias, bool throwException = true)
     {
         if strncmp(alias, "@", 1) {
             // not an alias
@@ -108,7 +108,7 @@ class BaseYii
 
         if isset $static::$aliases[root] {
             if is_string($static::$aliases[root]) {
-                return $pos === false ? $static::$aliases[root] : $static::$aliases[root] . substr(alias, pos);
+                return pos === false ? $static::$aliases[root] : $static::$aliases[root] . substr(alias, pos);
             } else {
                 var name, path;
                 for name, path in $static::$aliases[root] {
@@ -137,7 +137,7 @@ class BaseYii
      * @param string $alias the alias
      * @return string|boolean the root alias, or false if no root alias is found
      */
-    public static function getRootAlias(alias)
+    public static function getRootAlias(string alias)
     {
         var pos, root;
 
@@ -197,7 +197,7 @@ class BaseYii
      * @throws InvalidParamException if $path is an invalid alias.
      * @see getAlias()
      */
-    public static function setAlias(alias, path)
+    public static function setAlias(string alias, string path)
     {
         if strncmp(alias, "@", 1) {
             let alias = "@" . alias;
@@ -214,34 +214,52 @@ class BaseYii
         }
 
         if path !== null {
-            let path = strncmp(path, "@", 1) ? rtrim(path, "\\/") : $static::getAlias(path);
-            if !(isset $static::$aliases[root]) {
-                if pos === false {
-                    let $static::$aliases[root] = path;
-                } else {
-                    let $static::$aliases[root] = [alias : path];
-                }
+            var path_ext;
+            if strncmp(path, "@", 1) {
+                let path_ext = rtrim(path, "\\/");
+            }
+            else {
+                let path_ext = $static::getAlias(path);
             }
 
-            if is_string($static::$aliases[root]) {
+            //let path = strncmp(path, "@", 1) ? rtrim(path, "\\/") : $static::getAlias(path);
+            if !isset $static::$aliases[root] {
                 if pos === false {
-                    let $static::$aliases[root] = $path;
+                    let $static::$aliases[root] = path_ext;
                 } else {
-                    let $static::$aliases[root] = [ alias : path, root : $static::$aliases[root] ];
+                    let $static::$aliases[root] = [alias : path_ext];
                 }
             } else {
-                let $static::$aliases[root][alias] = path;
-                krsort($static::$aliases[root]);
-            }
-        }
 
-        if isset $static::$aliases[root] {
-            if is_array($static::$aliases[root]) {
-                unset($static::$aliases[root][alias]);
+                if is_string($static::$aliases[root]) {
+                    if pos === false {
+                        let $static::$aliases[root] = path_ext;
+                    } else {
+                        var elements = [];
+                        let elements[(string) alias] = path_ext,
+                            elements[(string) root] = $static::$aliases[root];
+                        let $static::$aliases[root] = elements;
+                    }
+                } else {
+                    let $static::$aliases[root][alias] = path_ext;
+                    //print_r($static::$aliases[root]);
+                    //echo "begin krsort";
+                    //krsort($static::$aliases[root]);
+                    //echo "end krsort";
+                    //print_r($static::$aliases[root]);
+                }
             }
+        } else {
 
-            if pos === false {
-                unset($static::$aliases[root]);
+            if isset $static::$aliases[root] {
+                if is_array($static::$aliases[root]) {
+                    unset($static::$aliases[root][alias]);
+                }
+                else {
+                    if pos === false {
+                        unset($static::$aliases[root]);
+                    }
+                }
             }
         }
     }
@@ -266,16 +284,15 @@ class BaseYii
      * @param string $className the fully qualified class name without a leading backslash "\"
      * @throws UnknownClassException if the class does not exist in the class file
      */
-    public static function autoload(className)
+    public static function autoload(string className)
     {
         var classFile;
         if isset $static::$classMap[className] {
             let classFile = $static::$classMap[className];
-            if classFile[0] === "@" {
+            if substr(classFile,0, 1) === "@" {
                 let classFile = $static::getAlias(classFile);
             }
         }
-
         if className->index("\\") !== false {
             let classFile = $static::getAlias("@" . str_replace("\\", "/", className) . ".php", false);
             if classFile === false || !is_file(classFile) {
@@ -285,7 +302,7 @@ class BaseYii
             return;
         }
 
-        include(classFile);
+        require(classFile);
 
         if (YII_DEBUG && !class_exists(className, false) && !interface_exists(className, false) && !trait_exists(className, false)) {
             throw new UnknownClassException("Unable to find \'" . className ."\' in file: " . classFile ." Namespace missing?");
@@ -337,22 +354,27 @@ class BaseYii
     public static function createObject(type, array params = [])
     {
         if is_string(type) {
-            return $static::container->get(type, params);
-        }
-        if is_array(type) && isset type["class"] {
-            var $class;
-            let $class = type["class"];
-            unset(type["class"]);
-            return $static::container->get($class, params, type);
-        }
-        if is_callable(type, true) {
-            return call_user_func(type, params);
-        }
-        if is_array(type) {
-            string text = "class";
-            throw new InvalidConfigException("Object configuration must be an array containing a \"". text ."\" element.");
+            return $static::$container->get(type, params);
         } else {
-            throw new InvalidConfigException("Unsupported configuration type: " . gettype(type));
+            if is_array(type) && isset type["class"] {
+                var $class;
+                let $class = type["class"];
+                unset(type["class"]);
+                return $static::$container->get($class, params, type);
+            }
+            else {
+                if is_callable(type, true) {
+                    return call_user_func(type, params);
+                }
+                else {
+                    if is_array(type) {
+                        string text = "class";
+                        throw new InvalidConfigException("Object configuration must be an array containing a \"". text ."\" element.");
+                    } else {
+                        throw new InvalidConfigException("Unsupported configuration type: " . gettype(type));
+                    }
+                }
+            }
         }
     }
 
@@ -385,11 +407,11 @@ class BaseYii
      * @param string $message the message to be logged.
      * @param string $category the category of the message.
      */
-    public static function trace(message, category = "application")
+    public static function trace(string message, string category = "application")
     {
-        //if (YII_DEBUG) {
+        if (YII_DEBUG) {
             $static::getLogger()->log(message, Logger::LEVEL_TRACE, category);
-        //}
+        }
     }
 
     /**
@@ -399,7 +421,7 @@ class BaseYii
      * @param string $message the message to be logged.
      * @param string $category the category of the message.
      */
-    public static function error(message, category = "application")
+    public static function error(string message, string category = "application")
     {
         $static::getLogger()->log(message, Logger::LEVEL_ERROR, category);
     }
@@ -411,7 +433,7 @@ class BaseYii
      * @param string $message the message to be logged.
      * @param string $category the category of the message.
      */
-    public static function warning(message, category = "application")
+    public static function warning(string message, string category = "application")
     {
         $static::getLogger()->log(message, Logger::LEVEL_WARNING, category);
     }
@@ -423,7 +445,7 @@ class BaseYii
      * @param string $message the message to be logged.
      * @param string $category the category of the message.
      */
-    public static function info(message, category = "application")
+    public static function info(string message, string category = "application")
     {
         $static::getLogger()->log(message, Logger::LEVEL_INFO, category);
     }
@@ -445,7 +467,7 @@ class BaseYii
      * @param string $category the category of this log message
      * @see endProfile()
      */
-    public static function beginProfile(token, category = "application")
+    public static function beginProfile(string token, string category = "application")
     {
         $static::getLogger()->log(token, Logger::LEVEL_PROFILE_BEGIN, category);
     }
@@ -457,7 +479,7 @@ class BaseYii
      * @param string $category the category of this log message
      * @see beginProfile()
      */
-    public static function endProfile(token, category = "application")
+    public static function endProfile(string token, string category = "application")
     {
         $static::getLogger()->log(token, Logger::LEVEL_PROFILE_END, category);
     }
@@ -496,7 +518,7 @@ class BaseYii
      * [[\yii\base\Application::language|application language]] will be used.
      * @return string the translated message.
      */
-    public static function t(category, message, var params = [], language = null)
+    public static function t(string category, string message, var params = [], language = null)
     {
         if $static::$app !== null {
             return $static::$app->getI18n()->translate(category, message, params, language ? language : $static::$app->language);
@@ -522,7 +544,6 @@ class BaseYii
         for name, value in properties {
             let $object->{name} = value;
         }
-
         return $object;
     }
 
@@ -534,7 +555,7 @@ class BaseYii
      * @param object $object the object to be handled
      * @return array the public member variables of the object
      */
-    public static function getObjectVars($object)
+    public static function getObjectVars(object $object)
     {
         return get_object_vars($object);
     }

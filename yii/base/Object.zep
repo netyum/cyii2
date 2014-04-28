@@ -6,7 +6,7 @@
 
 namespace yii\base;
 
-//use Yii;
+use yii\BaseYii;
 
 /**
  * Object is the base class that implements the *property* feature.
@@ -97,10 +97,10 @@ class $Object
      *
      * @param array config name-value pairs that will be used to initialize the object properties
      */
-    public function __construct(array config = [])
+    public function __construct(config = [])
     {
         if count(config) != 0 {
-            //Yii::configure(this, config);
+            BaseYii::configure(this, config);
         }
         this->init();
     }
@@ -125,7 +125,7 @@ class $Object
      * @throws InvalidCallException if the property is write-only
      * @see __set()
      */
-    public function __get(name)
+    public function __get(string name)
     {
     	var getter, setter;
         let getter = "get". name,
@@ -153,7 +153,7 @@ class $Object
      * @throws InvalidCallException if the property is read-only
      * @see __get()
      */
-    public function __set(name, value)
+    public function __set(string name, value)
     {
     	var getter, setter;
         let getter = "get". name,
@@ -179,7 +179,7 @@ class $Object
      * @param string name the property name or the event name
      * @return boolean whether the named property is set (not null).
      */
-    public function __isset(name)
+    public function __isset(string name)
     {
     	var getter;
         let getter = "get" . name;
@@ -201,7 +201,7 @@ class $Object
      * @param string name the property name
      * @throws InvalidCallException if the property is read only.
      */
-    public function __unset(name)
+    public function __unset(string name)
     {
     	var getter, setter;
         let getter = "get". name,
@@ -226,7 +226,7 @@ class $Object
      * @throws UnknownMethodException when calling unknown method
      * @return mixed the method return value
      */
-    public function __call(name, params)
+    public function __call(string name, params)
     {
         throw new UnknownMethodException("Calling unknown method: " . get_class(this) . "::name()");
     }
@@ -245,7 +245,7 @@ class $Object
      * @see canGetProperty()
      * @see canSetProperty()
      */
-    public function hasProperty(name, checkVars = true)
+    public function hasProperty(string name, checkVars = true)
     {
         return this->canGetProperty(name, checkVars) || this->canSetProperty(name, false);
     }
@@ -263,7 +263,7 @@ class $Object
      * @return boolean whether the property can be read
      * @see canSetProperty()
      */
-    public function canGetProperty(name, checkVars = true)
+    public function canGetProperty(string name, checkVars = true)
     {
         return method_exists(this, "get" . name) || checkVars && property_exists(this, name);
     }
@@ -281,7 +281,7 @@ class $Object
      * @return boolean whether the property can be written
      * @see canGetProperty()
      */
-    public function canSetProperty(name, checkVars = true)
+    public function canSetProperty(string name, checkVars = true)
     {
         return method_exists(this, "set" . name) || checkVars && property_exists(this, name);
     }
@@ -294,7 +294,7 @@ class $Object
      * @param string name the property name
      * @return boolean whether the property is defined
      */
-    public function hasMethod(name)
+    public function hasMethod(string name)
     {
         return method_exists(this, name);
     }

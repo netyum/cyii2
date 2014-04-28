@@ -104,12 +104,13 @@ class Instance
      */
     public static function ensure(reference, var type = null, container = null)
     {
-        if  reference instanceof type {
+        if reference instanceof type {
             return reference;
         }
-
-        if empty reference {
-            throw new InvalidConfigException("The required component is not specified.");
+        else {
+            if empty reference {
+                throw new InvalidConfigException("The required component is not specified.");
+            }
         }
 
         if is_string(reference) {

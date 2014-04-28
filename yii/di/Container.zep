@@ -6,7 +6,7 @@
 
 namespace yii\di;
 
-use \ReflectionClass;
+use ReflectionClass;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 
@@ -92,7 +92,8 @@ use yii\base\InvalidConfigException;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class Container extends Component
+class Container 
+//extends Component
 {
     /**
      * @var array singleton objects indexed by their types
@@ -137,17 +138,17 @@ class Container extends Component
      * @return object an instance of the requested class.
      * @throws InvalidConfigException if the class cannot be recognized or correspond to an invalid definition
      */
-    public function get($class, var params = [], var config = [])
+    public function get(string $class, params = [], config = [])
     {
         if isset this->_singletons[$class] {
             // singleton
             return this->_singletons[$class];
-        } 
-
-        if !isset this->_definitions[$class] {
-            return this->build($class, params, config);
         }
-
+        else {
+            if !isset this->_definitions[$class] {
+                return this->build($class, params, config);
+            }
+        }
         var definition, $object;
         let definition = this->_definitions[$class];
 
@@ -155,27 +156,31 @@ class Container extends Component
             let params = this->resolveDependencies(this->mergeParams($class, params));
             let $object = call_user_func(definition, this, params, config);
         }
+        else {
 
-        if is_array(definition) {
-            var concrete;
-            let concrete = definition["class"];
-            unset(definition["class"]);
+            if is_array(definition) {
+                var concrete;
+                let concrete = definition["class"];
+                unset(definition["class"]);
 
-            let config = array_merge(definition, config);
-            let params = $this->mergeParams($class, params);
+                let config = array_merge(definition, config);
+                let params = $this->mergeParams($class, params);
 
-            if concrete === $class {
-                let $object = this->build($class, params, config);
-            } else {
-                let $object = this->get(concrete, params, config);
+                if concrete === $class {
+                    let $object = this->build($class, params, config);
+                } else {
+                    let $object = this->get(concrete, params, config);
+                }
             }
-        }
+            else {
 
-        if is_object(definition) {
-            let this->_singletons[$class] = definition;
-            return this->_singletons[$class];
-        } else {
-            throw new InvalidConfigException("Unexpected object definition type: " . gettype(definition));
+                if is_object(definition) {
+                    let this->_singletons[$class] = definition;
+                    return this->_singletons[$class];
+                } else {
+                    throw new InvalidConfigException("Unexpected object definition type: " . gettype(definition));
+                }
+            }
         }
 
         if array_key_exists($class, this->_singletons) {
@@ -248,8 +253,9 @@ class Container extends Component
      * constructor when [[get()]] is called.
      * @return static the container itself
      */
-    public function set($class, var definition = [], array params = [])
+    public function set(string $class, var definition = [], array params = [])
     {
+        
         let this->_definitions[$class] = this->normalizeDefinition($class, definition);
         let this->_params[$class] = params;
         unset($this->_singletons[$class]);
@@ -269,7 +275,7 @@ class Container extends Component
      * @return static the container itself
      * @see set()
      */
-    public function setSingleton($class, var definition = [], array params = [])
+    public function setSingleton(string $class, var definition = [], array params = [])
     {
         let this->_definitions[$class] = this->normalizeDefinition($class, definition);
         let this->_params[$class] = params;
@@ -283,9 +289,9 @@ class Container extends Component
      * @return boolean whether the container has the definition of the specified name..
      * @see set()
      */
-    public function has($class)
+    public function has(string $class)
     {
-        return isset(this->_singletons[$class]);
+        return isset this->_singletons[$class];
     }
 
     /**
@@ -295,7 +301,7 @@ class Container extends Component
      * @return boolean whether the given name corresponds to a registered singleton. If `$checkInstance` is true,
      * the method should return a value indicating whether the singleton has been instantiated.
      */
-    public function hasSingleton($class, checkInstance = false)
+    public function hasSingleton(string $class, bool checkInstance = false)
     {
         return checkInstance ? isset(this->_singletons[$class]) : array_key_exists($class, this->_singletons);
     }
@@ -304,7 +310,7 @@ class Container extends Component
      * Removes the definition for the specified name.
      * @param string $class class name, interface name or alias name
      */
-    public function clear($class)
+    public function clear(string $class)
     {
         unset(this->_definitions[$class]);
         unset(this->_singletons[$class]);
@@ -317,7 +323,7 @@ class Container extends Component
      * @return array the normalized class definition
      * @throws InvalidConfigException if the definition is invalid.
      */
-    protected function normalizeDefinition($class, definition)
+    protected function normalizeDefinition(string $class, definition)
     {
         if empty definition {
             return ["class" : $class];
@@ -364,11 +370,12 @@ class Container extends Component
      * @param array $config configurations to be applied to the new instance
      * @return object the newly created instance of the specified class
      */
-    protected function build($class, $params, $config)
+    protected function build(string $class, params, config)
     {
         /** @var ReflectionClass $reflection */
-        var elements, reflection, dependencies;
+        var elements = [], reflection, dependencies;
         let elements = this->getDependencies($class);
+
         let reflection   = elements[0],
             dependencies = elements[1];
 
@@ -400,7 +407,7 @@ class Container extends Component
      * @param array $params the constructor parameters
      * @return array the merged parameters
      */
-    protected function mergeParams($class, params)
+    protected function mergeParams(string $class, params)
     {
         if empty this->_params[$class] {
             return params;
@@ -423,7 +430,7 @@ class Container extends Component
      * @param string $class class name, interface name or alias name
      * @return array the dependencies of the specified class.
      */
-    protected function getDependencies($class)
+    protected function getDependencies(string $class)
     {
         if isset this->_reflections[$class] {
             return [this->_reflections[$class], this->_dependencies[$class]];
@@ -439,8 +446,13 @@ class Container extends Component
                     let dependencies[] = param->getDefaultValue();
                 } else {
                     var c;
-                    let c = $param->getClass();
-                    let dependencies[] = Instance::of(c === null ? null : c->getName());
+                    let c = param->getClass();
+                    if is_null(c) {
+                        let dependencies[] = Instance::of(c);
+                    }
+                    else {
+                        let dependencies[] = Instance::of(c->getName());
+                    }
                 }
             }
         }
@@ -458,20 +470,22 @@ class Container extends Component
      * @return array the resolved dependencies
      * @throws InvalidConfigException if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      */
-    protected function resolveDependencies(dependencies, reflection = null)
+    protected function resolveDependencies(dependencies, var reflection = null)
     {
         var index, dependency;
         for index, dependency in dependencies {
-            if dependency instanceof Instance {
+            if is_object(dependency) && (dependency instanceof Instance) {
+                echo "resolveDependencies in Container  Instance\n";
                 if dependency->id !== null {
                     let dependencies[index] = this->get(dependency->id);
-                } 
-
-                if (reflection !== null) {
-                    var name, $class;
-                    let name = reflection->getConstructor()->getParameters()[index]->getName();
-                    let $class = reflection->getName();
-                    throw new InvalidConfigException("Missing required parameter \"" . name ."\" when instantiating \"". $class ."\".");
+                }
+                else {
+                    if (reflection !== null) {
+                        var name, $class;
+                        let name = reflection->getConstructor()->getParameters()[index]->getName();
+                        let $class = reflection->getName();
+                        throw new InvalidConfigException("Missing required parameter \"" . name ."\" when instantiating \"". $class ."\".");
+                    }
                 }
             }
         }

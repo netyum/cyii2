@@ -128,7 +128,7 @@ class Logger extends Component
      */
     public function log(message, level, category = "application")
     {
-        var time, traces = [], ts, count;
+        /*var time, traces = [], ts, count;
         let time = microtime(true);
         if this->traceLevel > 0 {
             let count = 0,
@@ -154,7 +154,7 @@ class Logger extends Component
         let this->messages[] = [message, level, category, time, traces];
         if this->flushInterval > 0 && count(this->messages) >= this->flushInterval {
             this->flush();
-        }
+        }*/
     }
 
     /**
@@ -163,10 +163,11 @@ class Logger extends Component
      */
     public function flush($final = false)
     {
+        /*
         if this->dispatcher instanceof Dispatcher {
             this->dispatcher->dispatch(this->messages, $final);
         }
-        let this->messages = [];
+        let this->messages = [];*/
     }
 
     /**
@@ -178,7 +179,7 @@ class Logger extends Component
      */
     public function getElapsedTime()
     {
-        return microtime(true) - YII_BEGIN_TIME;
+        //return microtime(true) - YII_BEGIN_TIME;
     }
 
     /**
@@ -198,6 +199,7 @@ class Logger extends Component
      */
     public function getProfiling(categories = [], excludeCategories = [])
     {
+        /*
         var timings;
         let timings = this->calculateTimings(this->messages);
         if (empty categories) && (empty excludeCategories) {
@@ -233,6 +235,7 @@ class Logger extends Component
         }
 
         return array_values(timings);
+        */
     }
 
     /**
@@ -262,6 +265,7 @@ class Logger extends Component
      */
     public function calculateTimings($messages)
     {
+        /*
         var timings = [], stack = [], i, log;
 
         for i, log in messages {
@@ -293,7 +297,7 @@ class Logger extends Component
 
         ksort(timings);
 
-        return array_values(timings);
+        return array_values(timings);*/
     }
 
 
