@@ -245,7 +245,7 @@ class $Object
      * @see canGetProperty()
      * @see canSetProperty()
      */
-    public function hasProperty(string name, checkVars = true)
+    public function hasProperty(string name, checkVars = true) -> boolean
     {
         return this->canGetProperty(name, checkVars) || this->canSetProperty(name, false);
     }
@@ -263,7 +263,7 @@ class $Object
      * @return boolean whether the property can be read
      * @see canSetProperty()
      */
-    public function canGetProperty(string name, checkVars = true)
+    public function canGetProperty(string name, checkVars = true) -> boolean
     {
         return method_exists(this, "get" . name) || checkVars && property_exists(this, name);
     }
@@ -281,7 +281,7 @@ class $Object
      * @return boolean whether the property can be written
      * @see canGetProperty()
      */
-    public function canSetProperty(string name, checkVars = true)
+    public function canSetProperty(string name, checkVars = true) -> boolean
     {
         return method_exists(this, "set" . name) || checkVars && property_exists(this, name);
     }
@@ -294,7 +294,7 @@ class $Object
      * @param string name the property name
      * @return boolean whether the property is defined
      */
-    public function hasMethod(string name)
+    public function hasMethod(string name) -> boolean
     {
         return method_exists(this, name);
     }

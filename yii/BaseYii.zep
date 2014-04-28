@@ -222,20 +222,23 @@ class BaseYii
                 let path_ext = $static::getAlias(path);
             }
 
+            var elements = [];
+
             //let path = strncmp(path, "@", 1) ? rtrim(path, "\\/") : $static::getAlias(path);
             if !isset $static::$aliases[root] {
                 if pos === false {
                     let $static::$aliases[root] = path_ext;
                 } else {
-                    let $static::$aliases[root] = [alias : path_ext];
+                    let elements[(string) alias] = path_ext,
+                        $static::$aliases[root] = elements;
+                    return;
                 }
             } else {
-
                 if is_string($static::$aliases[root]) {
                     if pos === false {
                         let $static::$aliases[root] = path_ext;
                     } else {
-                        var elements = [];
+                        
                         let elements[(string) alias] = path_ext,
                             elements[(string) root] = $static::$aliases[root];
                         let $static::$aliases[root] = elements;
@@ -353,14 +356,18 @@ class BaseYii
      */
     public static function createObject(type, array params = [])
     {
-        if is_string(type) {
+        if typeof type == "string" {
             return $static::$container->get(type, params);
         } else {
-            if is_array(type) && isset type["class"] {
+            if typeof type == "array" && isset type["class"] {
                 var $class;
                 let $class = type["class"];
-                unset(type["class"]);
-                return $static::$container->get($class, params, type);
+                unset type["class"];
+                echo "createObject ";
+                echo $class."\n";
+                var $object;
+                let $object = $static::$container->get($class, params, type);
+                return $object;
             }
             else {
                 if is_callable(type, true) {
@@ -542,7 +549,9 @@ class BaseYii
     {
         var name, value;
         for name, value in properties {
-            let $object->{name} = value;
+            var tmp;
+            let tmp = value;
+            let $object->{name} = tmp;
         }
         return $object;
     }

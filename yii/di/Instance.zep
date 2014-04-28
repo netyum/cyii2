@@ -113,7 +113,7 @@ class Instance
             }
         }
 
-        if is_string(reference) {
+        if typeof reference == "string" {
             let reference = new $static(reference);
         }
 

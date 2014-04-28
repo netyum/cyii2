@@ -140,28 +140,30 @@ class Container
      */
     public function get(string $class, params = [], config = [])
     {
-        if isset this->_singletons[$class] {
+        var singleton;
+        if fetch singleton, this->_singletons[$class] {
             // singleton
-            return this->_singletons[$class];
+            return singleton;
         }
         else {
             if !isset this->_definitions[$class] {
                 return this->build($class, params, config);
             }
         }
+
         var definition, $object;
         let definition = this->_definitions[$class];
 
         if is_callable(definition, true) {
-            let params = this->resolveDependencies(this->mergeParams($class, params));
+            let params = this->mergeParams($class, params);
+            let params = this->resolveDependencies(params);
             let $object = call_user_func(definition, this, params, config);
         }
         else {
-
             if is_array(definition) {
                 var concrete;
                 let concrete = definition["class"];
-                unset(definition["class"]);
+                unset definition["class"];
 
                 let config = array_merge(definition, config);
                 let params = $this->mergeParams($class, params);
@@ -174,9 +176,9 @@ class Container
             }
             else {
 
-                if is_object(definition) {
+                if typeof definition == "object" {
                     let this->_singletons[$class] = definition;
-                    return this->_singletons[$class];
+                    return definition;
                 } else {
                     throw new InvalidConfigException("Unexpected object definition type: " . gettype(definition));
                 }
@@ -255,10 +257,9 @@ class Container
      */
     public function set(string $class, var definition = [], array params = [])
     {
-        
         let this->_definitions[$class] = this->normalizeDefinition($class, definition);
         let this->_params[$class] = params;
-        unset($this->_singletons[$class]);
+        unset this->_singletons[$class];
         return this;
     }
 
@@ -289,7 +290,7 @@ class Container
      * @return boolean whether the container has the definition of the specified name..
      * @see set()
      */
-    public function has(string $class)
+    public function has(string $class) -> boolean
     {
         return isset this->_singletons[$class];
     }
@@ -301,19 +302,19 @@ class Container
      * @return boolean whether the given name corresponds to a registered singleton. If `$checkInstance` is true,
      * the method should return a value indicating whether the singleton has been instantiated.
      */
-    public function hasSingleton(string $class, bool checkInstance = false)
+    public function hasSingleton(string $class, bool checkInstance = false) -> boolean
     {
-        return checkInstance ? isset(this->_singletons[$class]) : array_key_exists($class, this->_singletons);
+        return checkInstance ? isset this->_singletons[$class] : array_key_exists($class, this->_singletons);
     }
 
     /**
      * Removes the definition for the specified name.
      * @param string $class class name, interface name or alias name
      */
-    public function clear(string $class)
+    public function clear(string $class) -> void
     {
-        unset(this->_definitions[$class]);
-        unset(this->_singletons[$class]);
+        unset this->_definitions[$class];
+        unset this->_singletons[$class];
     }
 
     /**
@@ -328,27 +329,31 @@ class Container
         if empty definition {
             return ["class" : $class];
         }
+        else {
+            if typeof definition == "string" {
+                return ["class" : definition];
+            }
+            else {
+                if is_callable(definition, true) || typeof definition == "object" {
+                    return definition;
+                }
+                else {
+                    if typeof definition == "array" {
+                        if !isset definition["class"] {
+                            if strpos($class , "\\") !== false {
+                                let definition["class"] = $class;
+                            } else {
+                                string text = "class";
+                                throw new InvalidConfigException("A class definition requires a \"". text ."\" member.");
+                            }
+                        }
+                        return definition;
+                    } else {
+                        throw new InvalidConfigException("Unsupported definition type for \"" . $class ."\": " . gettype(definition));
+                    }
 
-        if is_string(definition) {
-            return ["class" : definition];
-        }
-
-        if is_callable(definition, true) || is_object(definition) {
-            return definition;
-        }
-
-        if is_array(definition) {
-            if !isset definition["class"] {
-                if $class->index("\\") !== false {
-                    let definition["class"] = $class;
-                } else {
-                    string text = "class";
-                    throw new InvalidConfigException("A class definition requires a \"". text ."\" member.");
                 }
             }
-            return definition;
-        } else {
-            throw new InvalidConfigException("Unsupported definition type for \"" . $class ."\": " . gettype(definition));
         }
     }
 
@@ -384,9 +389,14 @@ class Container
             let dependencies[index] = param;
         }
 
-        if !empty(dependencies) && is_a($class, "yii\\base\\Object", true) {
-            // set $config as the last parameter (existing one will be overwritten)
-            let dependencies[count(dependencies) - 1] = config;
+        if !empty dependencies && is_a($class, "yii\\base\\Object", true) {
+            // set $config as the last parameter (existing one will be overwritten) 
+            if count(dependencies)  {
+                var i;
+                let i = count(dependencies),
+                    i = i - 1;
+                let dependencies[i] = config;
+            }
             let dependencies = this->resolveDependencies(dependencies, reflection);
             return reflection->newInstanceArgs(dependencies);
         } else {
@@ -432,14 +442,16 @@ class Container
      */
     protected function getDependencies(string $class)
     {
-        if isset this->_reflections[$class] {
-            return [this->_reflections[$class], this->_dependencies[$class]];
+        var r;
+        if fetch r, this->_reflections[$class] {
+            return [r,  this->_dependencies[$class]];
         }
+
         var dependencies = [], reflection, constructor;
-        let reflection = new ReflectionClass($class);
+        let reflection = new \ReflectionClass($class);
 
         let constructor = reflection->getConstructor();
-        if constructor !== null {
+        if typeof constructor !== "null" {
             var param;
             for param in constructor->getParameters() {
                 if param->isDefaultValueAvailable() {
@@ -447,7 +459,7 @@ class Container
                 } else {
                     var c;
                     let c = param->getClass();
-                    if is_null(c) {
+                    if typeof c == "null" {
                         let dependencies[] = Instance::of(c);
                     }
                     else {
@@ -474,13 +486,13 @@ class Container
     {
         var index, dependency;
         for index, dependency in dependencies {
-            if is_object(dependency) && (dependency instanceof Instance) {
+            if typeof dependency == "object" && (dependency instanceof Instance) {
                 echo "resolveDependencies in Container  Instance\n";
                 if dependency->id !== null {
                     let dependencies[index] = this->get(dependency->id);
                 }
                 else {
-                    if (reflection !== null) {
+                    if typeof reflection !== "null" {
                         var name, $class;
                         let name = reflection->getConstructor()->getParameters()[index]->getName();
                         let $class = reflection->getName();
