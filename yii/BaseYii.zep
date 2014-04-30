@@ -98,8 +98,8 @@ class BaseYii
         }
         var pos, root;
 
-        let pos = alias->index("/");
-        if pos === false {
+        let pos = strpos(alias, "/");
+        if typeof pos == "boolean" {
             let root = alias;
         }
         else {
@@ -110,14 +110,11 @@ class BaseYii
             if is_string($static::$aliases[root]) {
                 return pos === false ? $static::$aliases[root] : $static::$aliases[root] . substr(alias, pos);
             } else {
-                var name, path;
+                var name, path, new_pos;
                 for name, path in $static::$aliases[root] {
-                    var alias_ext, name_ext;
-                    let alias_ext = alias . "/",
-                        name_ext = name ."/";
-
-                    if alias_ext->index(name_ext) === 0 {
-                        return path . substr(alias, name->length());
+                    let new_pos = strpos(alias . "/", name ."/");
+                    if typeof new_pos != "boolean" && new_pos == 0 {
+                        return path . substr(alias, strlen(name));
                     }
                 }
             }
@@ -141,8 +138,8 @@ class BaseYii
     {
         var pos, root;
 
-        let pos = alias->index("/");
-        if pos === false {
+        let pos = strpos(alias, "/");
+        if typeof pos == "boolean" {
             let root = alias;
         }
         else {
@@ -153,13 +150,10 @@ class BaseYii
             if is_string($static::$aliases[root]) {
                 return root;
             } else {
-                var name, path;
+                var name, path, new_pos;
                 for name, path in $static::$aliases[root] {
-                    var alias_ext, name_ext;
-                    let alias_ext = alias . "/",
-                        name_ext = name ."/";
-
-                    if alias_ext->index(name_ext) === 0 {
+                    let new_pos = strpos(alias . "/", name ."/");
+                    if typeof new_pos != "boolean" && new_pos == 0 {
                         return name;
                     }
                 }
@@ -204,9 +198,9 @@ class BaseYii
         }
 
         var pos, root;
-        let pos = alias->index("/");
+        let pos = strpos(alias, "/");
         
-        if pos === false {
+        if typeof pos == "boolean" {
             let root = alias;
         }
         else {
@@ -221,7 +215,6 @@ class BaseYii
             else {
                 let path_ext = $static::getAlias(path);
             }
-
             var elements = [];
 
             //let path = strncmp(path, "@", 1) ? rtrim(path, "\\/") : $static::getAlias(path);
@@ -229,27 +222,21 @@ class BaseYii
                 if pos === false {
                     let $static::$aliases[root] = path_ext;
                 } else {
-                    let elements[(string) alias] = path_ext,
+                    let elements[alias] = path_ext,
                         $static::$aliases[root] = elements;
-                    return;
                 }
             } else {
                 if is_string($static::$aliases[root]) {
                     if pos === false {
                         let $static::$aliases[root] = path_ext;
                     } else {
-                        
                         let elements[(string) alias] = path_ext,
                             elements[(string) root] = $static::$aliases[root];
                         let $static::$aliases[root] = elements;
                     }
                 } else {
                     let $static::$aliases[root][alias] = path_ext;
-                    //print_r($static::$aliases[root]);
-                    //echo "begin krsort";
-                    //krsort($static::$aliases[root]);
-                    //echo "end krsort";
-                    //print_r($static::$aliases[root]);
+                    krsort($static::$aliases[root]);
                 }
             }
         } else {
@@ -363,8 +350,6 @@ class BaseYii
                 var $class;
                 let $class = type["class"];
                 unset type["class"];
-                echo "createObject ";
-                echo $class."\n";
                 var $object;
                 let $object = $static::$container->get($class, params, type);
                 return $object;

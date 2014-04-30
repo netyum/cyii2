@@ -47,7 +47,7 @@ class Event extends $Object
      */
     public data;
 
-    private static _events;
+    protected static _events;
 
     /**
      * Attaches an event handler to a class-level event.

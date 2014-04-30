@@ -99,11 +99,11 @@ class Component extends $Object
     /**
      * @var array the attached event handlers (event name => handlers)
      */
-    private _events;
+    public _events;
     /**
      * @var Behavior[] the attached behaviors (behavior name => behavior)
      */
-    private _behaviors;
+    public _behaviors;
 
     /**
      * Returns the value of a component property.
@@ -163,7 +163,7 @@ class Component extends $Object
      */
     public function __set(string name, value)
     {
-        var getter, setter;
+        var getter, setter, cmp_result;
 
         let getter = "get". name,
             setter = "set". name;
@@ -175,25 +175,27 @@ class Component extends $Object
             return;
         }
         else {
-
-            if strncmp(name, "on ", 3) === 0 {
+            let cmp_result = strncmp(name, "on ", 3);
+            if typeof cmp_result != "boolean" && cmp_result == 0 {
+                let name = substr(name, 3),
+                    name = name->trim();
                 // on event: attach event handler
-                this->on(trim(substr(name, 3)), value);
-
+                this->on(name, value);
                 return;
             }
             else {
-
-                if (strncmp(name, "as ", 3) === 0) {
+                let cmp_result = strncmp(name, "as ", 3);
+                if typeof cmp_result != "boolean" && cmp_result == 0 {
                     // as behavior: attach behavior
-                    let name = trim(substr(name, 3));
-                    if is_object(value) && (value instanceof Behavior) {
+                    let name = substr(name, 3),
+                        name = name->trim();
+
+                    if typeof value == "object" && (value instanceof Behavior) {
                         this->attachBehavior(name, value);
                     }
                     else {
                         this->attachBehavior(name, BaseYii::createObject(value));
                     }
-
                     return;
                 } else {
                     // behavior property
@@ -202,7 +204,6 @@ class Component extends $Object
                     for behavior in this->_behaviors {
                         if behavior->canSetProperty(name) {
                             let behavior->{name} = value;
-
                             return;
                         }
                     }
@@ -484,8 +485,12 @@ class Component extends $Object
     public function hasEventHandlers(string name)
     {
         this->ensureBehaviors();
-
-        return !empty this->_events[name] || Event::hasHandlers(this, name);
+        if isset this->_events[name] && !empty this->_events[name] {
+            return true;
+        }
+        else {
+            return Event::hasHandlers(this, name);
+        }
     }
 
     /**
@@ -539,26 +544,39 @@ class Component extends $Object
      */
     public function off(string name, handler = null)
     {
+        var removed, events, temp_event, removed_temp_event;
+
         this->ensureBehaviors();
 
-        var removed;
         if empty this->_events[name] {
             return false;
         }
-        if handler === null {
-            unset(this->_events[name]);
+
+        if typeof handler == "null" {
+            let events = this->_events;
+            unset events[name];
+            let this->_events = events;
             return true;
         } else {
-            let removed = false;
+            let removed = false,
+                events = this->_events;
+
             var i, event;
             for i, event in this->_events[name] {
-                if event[0] === handler {
-                    unset(this->_events[name][i]);
-                    let removed = true;
+                if event[0] == handler {
+                    let temp_event = events[name];
+                    unset temp_event[i];
+
+                    let events[name] = temp_event,
+                        removed = true;
                 }
             }
+
             if (removed) {
-                let this->_events[name] = array_values(this->_events[name]);
+                let removed_temp_event = events[name],
+                    removed_temp_event = array_values(removed_temp_event),
+                    events[name] = removed_temp_event,
+                    this->_events = events;
             }
 
             return removed;
@@ -669,13 +687,14 @@ class Component extends $Object
      */
     public function detachBehavior(string name)
     {
+        var behavior, behaviors;
         this->ensureBehaviors();
-        if isset this->_behaviors[name] {
-            var behavior;
-            let behavior = this->_behaviors[name];
-            unset($this->_behaviors[name]);
-            behavior->detach();
+        let behaviors = this->_behaviors;
 
+        if fetch behavior, behaviors[name] {
+            unset behaviors[name];
+            let this->_behaviors = behaviors;
+            behavior->detach();
             return behavior;
         } else {
             return null;
@@ -687,9 +706,10 @@ class Component extends $Object
      */
     public function detachBehaviors()
     {
+        var name, behavior, behaviors;
         this->ensureBehaviors();
-        var name, behavior;
-        for name, behavior in this->_behaviors {
+        let behaviors = this->_behaviors;
+        for name, behavior in behaviors {
             this->detachBehavior(name);
         }
     }
@@ -699,7 +719,7 @@ class Component extends $Object
      */
     public function ensureBehaviors()
     {
-        if is_null(this->_behaviors) {
+        if typeof this->_behaviors == "null" {
             let this->_behaviors = [];
             
             var name, behavior;
@@ -715,19 +735,22 @@ class Component extends $Object
      * @param string|array|Behavior $behavior the behavior to be attached
      * @return Behavior the attached behavior.
      */
-    private function attachBehaviorInternal(string name, behavior)
+    protected function attachBehaviorInternal(string name, behavior)
     {
+        var temp_behavior, behaviors;
         if !(behavior instanceof Behavior) {
             let behavior = BaseYii::createObject(behavior);
         }
-        if isset this->_behaviors[name] {
-            var behavior_ext;
-            let behavior_ext = this->_behaviors[name];
-            behavior_ext->detach();
+
+        if fetch temp_behavior, this->_behaviors[name] {
+            temp_behavior->detach();
         }
+        
         behavior->attach(this);
 
-        let this->_behaviors[name] = behavior;
-        return this->_behaviors[name];
+        let behaviors = this->_behaviors,
+            behaviors[name] = behavior,
+            this->_behaviors = behaviors;
+        return behavior;
     }
 }
