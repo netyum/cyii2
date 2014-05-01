@@ -99,11 +99,11 @@ class Component extends $Object
     /**
      * @var array the attached event handlers (event name => handlers)
      */
-    public _events;
+    protected _events;
     /**
      * @var Behavior[] the attached behaviors (behavior name => behavior)
      */
-    public _behaviors;
+    protected _behaviors;
 
     /**
      * Returns the value of a component property.
@@ -122,12 +122,13 @@ class Component extends $Object
      */
     public function __get(string name)
     {
+        this->ensureEvents();
         var getter, setter;
         let getter = "get". name,
             setter = "set". name;
 
         if method_exists(this, getter) {
-            return $this->{getter}();
+            return this->{getter}();
         } else {
             this->ensureBehaviors();
             var behavior;
@@ -163,6 +164,7 @@ class Component extends $Object
      */
     public function __set(string name, value)
     {
+        this->ensureEvents();
         var getter, setter, cmp_result;
 
         let getter = "get". name,
@@ -170,7 +172,7 @@ class Component extends $Object
 
         if method_exists(this, setter) {
             // set property
-            $this->{setter}(value);
+            this->{setter}(value);
 
             return;
         }
@@ -231,6 +233,7 @@ class Component extends $Object
      */
     public function __isset(string name)
     {
+        this->ensureEvents();
         var getter;
         let getter = "get". name;
 
@@ -264,6 +267,7 @@ class Component extends $Object
      */
     public function __unset(string $name)
     {
+        this->ensureEvents();
         var setter;
         let setter = "set". name;
 
@@ -300,6 +304,7 @@ class Component extends $Object
      */
     public function __call(string name, params)
     {
+        this->ensureEvents();
         this->ensureBehaviors();
         var $object;
         for $object in this->_behaviors {
@@ -339,6 +344,7 @@ class Component extends $Object
      */
     public function hasProperty(string name, bool checkVars = true, bool checkBehaviors = true)
     {
+        this->ensureEvents();
         return this->canGetProperty(name, checkVars, checkBehaviors) || this->canSetProperty(name, false, checkBehaviors);
     }
 
@@ -359,6 +365,7 @@ class Component extends $Object
      */
     public function canGetProperty(string name, bool checkVars = true, bool checkBehaviors = true)
     {
+        this->ensureEvents();
         var getter;
         let getter = "get" . name;
 
@@ -396,6 +403,7 @@ class Component extends $Object
      */
     public function canSetProperty(string name, bool checkVars = true, bool checkBehaviors = true)
     {
+        this->ensureEvents();
         var setter;
         let setter = "set". name;
 
@@ -429,6 +437,7 @@ class Component extends $Object
      */
     public function hasMethod(string name, bool checkBehaviors = true)
     {
+        this->ensureEvents();
         if method_exists(this, name) {
             return true;
         } 
@@ -474,6 +483,7 @@ class Component extends $Object
      */
     public function behaviors()
     {
+        this->ensureEvents();
         return [];
     }
 
@@ -484,6 +494,7 @@ class Component extends $Object
      */
     public function hasEventHandlers(string name)
     {
+        this->ensureEvents();
         this->ensureBehaviors();
         if isset this->_events[name] && !empty this->_events[name] {
             return true;
@@ -627,6 +638,7 @@ class Component extends $Object
      */
     public function trigger(string name, <Event> event = null)
     {
+        this->ensureEvents();
         this->ensureBehaviors();
         if isset this->_events[name] && !empty this->_events[name] {
             if typeof event == "null" {
@@ -659,9 +671,10 @@ class Component extends $Object
      */
     public function getBehavior(string name)
     {
-        $this->ensureBehaviors();
+        this->ensureEvents();
+        this->ensureBehaviors();
 
-        return isset($this->_behaviors[name]) ? $this->_behaviors[name] : null;
+        return isset this->_behaviors[name] ? this->_behaviors[name] : null;
     }
 
     /**
@@ -670,6 +683,7 @@ class Component extends $Object
      */
     public function getBehaviors()
     {
+        this->ensureEvents();
         this->ensureBehaviors();
 
         return this->_behaviors;
@@ -692,6 +706,7 @@ class Component extends $Object
      */
     public function attachBehavior(string name, behavior)
     {
+        this->ensureEvents();
         this->ensureBehaviors();
 
         return this->attachBehaviorInternal(name, behavior);
@@ -706,6 +721,7 @@ class Component extends $Object
      */
     public function attachBehaviors(behaviors)
     {
+        this->ensureEvents();
         this->ensureBehaviors();
 
         var name, behavior;
@@ -723,6 +739,7 @@ class Component extends $Object
     public function detachBehavior(string name)
     {
         var behavior, behaviors;
+        this->ensureEvents();
         this->ensureBehaviors();
         let behaviors = this->_behaviors;
 
@@ -742,6 +759,7 @@ class Component extends $Object
     public function detachBehaviors()
     {
         var name, behavior, behaviors;
+        this->ensureEvents();
         this->ensureBehaviors();
         let behaviors = this->_behaviors;
         for name, behavior in behaviors {
@@ -754,6 +772,9 @@ class Component extends $Object
      */
     public function ensureBehaviors()
     {
+        if this->_events != "array" {
+            let this->_events = [];
+        }
         if typeof this->_behaviors == "null" {
             let this->_behaviors = [];
             
@@ -761,6 +782,13 @@ class Component extends $Object
             for name, behavior in this->behaviors() {
                 this->attachBehaviorInternal(name, behavior);
             }
+        }
+    }
+
+    protected function ensureEvents()
+    {
+        if this->_events == "null" {
+            let this->_events = [];
         }
     }
 
@@ -772,6 +800,9 @@ class Component extends $Object
      */
     protected function attachBehaviorInternal(string name, behavior)
     {
+        if this->_events != "array" {
+            let this->_events = [];
+        }
         var temp_behavior, behaviors;
         if typeof behavior != "object" {
             let behavior = BaseYii::createObject(behavior);

@@ -176,7 +176,7 @@ class Container
                 unset definition["class"];
 
                 let config = array_merge(definition, config);
-                let params = $this->mergeParams($class, params);
+                let params = this->mergeParams($class, params);
 
                 if concrete === $class {
                     let $object = this->build($class, params, config);
