@@ -104,7 +104,7 @@ class Logger extends Component
     /**
      * @var Dispatcher the message dispatcher
      */
-    public $dispatcher;
+    public dispatcher;
 
 
     /**
@@ -128,7 +128,7 @@ class Logger extends Component
      */
     public function log(message, level, category = "application")
     {
-        /*var time, traces = [], ts, count;
+        var time, traces = [], ts, count;
         let time = microtime(true);
         if this->traceLevel > 0 {
             let count = 0,
@@ -154,7 +154,7 @@ class Logger extends Component
         let this->messages[] = [message, level, category, time, traces];
         if this->flushInterval > 0 && count(this->messages) >= this->flushInterval {
             this->flush();
-        }*/
+        }
     }
 
     /**
@@ -163,11 +163,10 @@ class Logger extends Component
      */
     public function flush($final = false)
     {
-        /*
         if this->dispatcher instanceof Dispatcher {
             this->dispatcher->dispatch(this->messages, $final);
         }
-        let this->messages = [];*/
+        let this->messages = [];
     }
 
     /**
@@ -179,7 +178,7 @@ class Logger extends Component
      */
     public function getElapsedTime()
     {
-        //return microtime(true) - YII_BEGIN_TIME;
+        return microtime(true) - YII_BEGIN_TIME;
     }
 
     /**
@@ -199,7 +198,6 @@ class Logger extends Component
      */
     public function getProfiling(categories = [], excludeCategories = [])
     {
-        /*
         var timings;
         let timings = this->calculateTimings(this->messages);
         if (empty categories) && (empty excludeCategories) {
@@ -235,7 +233,7 @@ class Logger extends Component
         }
 
         return array_values(timings);
-        */
+        
     }
 
     /**
@@ -247,14 +245,17 @@ class Logger extends Component
      */
     public function getDbProfiling()
     {
-        /*$timings = $this->getProfiling(['yii\db\Command::query', 'yii\db\Command::execute']);
-        $count = count($timings);
-        $time = 0;
-        foreach ($timings as $timing) {
-            $time += $timing['duration'];
+        var count, timings, time;
+        let timings = this->getProfiling(["yii\\db\\Command::query", "yii\\db\\Command::execute"]);
+        let count = count(timings),
+            time = 0;
+
+        var timing;
+        for timing in timings {
+            let time += (int) timing["duration"];
         }
 
-        return [$count, $time];*/
+        return [count, time];
     }
 
     /**
@@ -263,9 +264,9 @@ class Logger extends Component
      * @return array timings. Each element is an array consisting of these elements:
      * `info`, `category`, `timestamp`, `trace`, `level`, `duration`.
      */
-    public function calculateTimings($messages)
+    public function calculateTimings(messages)
     {
-        /*
+        
         var timings = [], stack = [], i, log;
 
         for i, log in messages {
@@ -297,7 +298,7 @@ class Logger extends Component
 
         ksort(timings);
 
-        return array_values(timings);*/
+        return array_values(timings);
     }
 
 

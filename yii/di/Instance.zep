@@ -117,7 +117,7 @@ class Instance
             let reference = new $static(reference);
         }
 
-        if reference instanceof self {
+        if reference instanceof Instance {
             var component;
             let component = reference->get(container);
             if type === null {
@@ -131,7 +131,7 @@ class Instance
         }
         var valueType;
         
-        let valueType = is_object(reference) ? get_class(reference) : gettype(reference);
+        let valueType = typeof reference == "object" ? get_class(reference) : gettype(reference);
         throw new InvalidConfigException("Invalid data type: $valueType. ". type . " is expected.");
     }
 

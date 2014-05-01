@@ -487,7 +487,6 @@ class Container
         var index, dependency;
         for index, dependency in dependencies {
             if typeof dependency == "object" && (dependency instanceof Instance) {
-                echo "resolveDependencies in Container  Instance\n";
                 if dependency->id !== null {
                     let dependencies[index] = this->get(dependency->id);
                 }
