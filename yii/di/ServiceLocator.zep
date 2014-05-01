@@ -265,7 +265,19 @@ class ServiceLocator extends Component
      */
     public function getComponents(bool returnDefinitions = true)
     {
-        return returnDefinitions ? this->_definitions : this->_components;
+        var components, definitions;
+        let components = this->_components;
+        let definitions = this->_definitions;
+
+        if typeof components != "array" {
+            let this->_components = [];
+        }
+
+        if typeof definitions != "array" {
+            let this->_definitions = [];
+        }
+        
+        return returnDefinitions ? definitions : components;
     }
 
     /**
