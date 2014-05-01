@@ -103,6 +103,14 @@ class ServiceLocator extends Component
      */
     public function has(string id, checkInstance = false)
     {
+       var components;
+        let components = this->_components;
+
+        if typeof components != "array" {
+            let components = [],
+                this->_components = components;
+        }
+
         if checkInstance {
             return isset this->_components[id];
         }
@@ -125,7 +133,14 @@ class ServiceLocator extends Component
      */
     public function get(string id, throwException = true)
     {
-        var component;
+        var components, component;
+        let components = this->_components;
+
+        if typeof components != "array" {
+            let components = [],
+                this->_components = components;
+        }
+
         if fetch component, this->_components[id] {
             return component;
         }
@@ -196,6 +211,18 @@ class ServiceLocator extends Component
      */
     public function set(string id, definition)
     {
+        var components, definitions;
+        let components = this->_components;
+        let definitions = this->_definitions;
+
+        if typeof components != "array" {
+            let this->_components = [];
+        }
+
+        if typeof definitions != "array" {
+            let this->_definitions = [];
+        }
+
         if typeof definition == "null" {
             unset this->_components[id];
             unset this->_definitions[id];
