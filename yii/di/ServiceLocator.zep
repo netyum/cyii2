@@ -51,11 +51,11 @@ class ServiceLocator extends Component
     /**
      * @var array shared component instances indexed by their IDs
      */
-    protected _components;
+    public _components;
     /**
      * @var array component definitions indexed by their IDs
      */
-    protected _definitions;
+    public _definitions;
 
     /**
      * Getter magic method.
@@ -276,7 +276,7 @@ class ServiceLocator extends Component
         if typeof definitions != "array" {
             let this->_definitions = [];
         }
-        
+
         return returnDefinitions ? definitions : components;
     }
 

@@ -92,6 +92,9 @@ class BaseYii
      */
     public static function getAlias(string alias, bool throwException = true)
     {
+        var aliases, root_alias;
+        let aliases = $static::aliases;
+
         if strncmp(alias, "@", 1) {
             // not an alias
             return alias;
@@ -106,12 +109,17 @@ class BaseYii
             let root = substr(alias, 0, pos);
         }
 
-        if isset $static::$aliases[root] {
-            if is_string($static::$aliases[root]) {
-                return pos === false ? $static::$aliases[root] : $static::$aliases[root] . substr(alias, pos);
+        if fetch root_alias, aliases[root] {
+            if typeof root_alias == "string" {
+                if typeof pos == "boolean" {
+                    return aliases[root];
+                }
+                else {
+                    return aliases[root] . substr(alias, pos);
+                }
             } else {
                 var name, path, new_pos;
-                for name, path in $static::$aliases[root] {
+                for name, path in aliases[root] {
                     let new_pos = strpos(alias . "/", name ."/");
                     if typeof new_pos != "boolean" && new_pos == 0 {
                         return path . substr(alias, strlen(name));
@@ -191,8 +199,16 @@ class BaseYii
      * @throws InvalidParamException if $path is an invalid alias.
      * @see getAlias()
      */
-    public static function setAlias(string alias, string path)
+    public static function setAlias(string alias, path)
     {
+        var aliases, root_alias;
+        let aliases = $static::aliases;
+
+
+        if typeof aliases != "array" {
+            let aliases = [];
+        }
+
         if strncmp(alias, "@", 1) {
             let alias = "@" . alias;
         }
@@ -207,7 +223,7 @@ class BaseYii
             let root = substr(alias, 0, pos);
         }
 
-        if path !== null {
+        if typeof path == "string" {
             var path_ext;
             if strncmp(path, "@", 1) {
                 let path_ext = rtrim(path, "\\/");
@@ -217,41 +233,44 @@ class BaseYii
             }
             var elements = [];
 
-            //let path = strncmp(path, "@", 1) ? rtrim(path, "\\/") : $static::getAlias(path);
-            if !isset $static::$aliases[root] {
-                if pos === false {
-                    let $static::$aliases[root] = path_ext;
+            if !isset aliases[root] {
+                if typeof pos == "boolean" {
+                    let aliases[root] = path_ext;
                 } else {
                     let elements[alias] = path_ext,
-                        $static::$aliases[root] = elements;
+                        aliases[root] = elements;
                 }
             } else {
-                if is_string($static::$aliases[root]) {
-                    if pos === false {
-                        let $static::$aliases[root] = path_ext;
+                if typeof aliases[root] == "string" {
+                    if typeof pos == "boolean" {
+                        let aliases[root] = path_ext;
                     } else {
-                        let elements[(string) alias] = path_ext,
-                            elements[(string) root] = $static::$aliases[root];
-                        let $static::$aliases[root] = elements;
+                        let elements[alias] = path_ext,
+                            elements[root] = aliases[root];
+                        let aliases[root] = elements;
                     }
                 } else {
-                    let $static::$aliases[root][alias] = path_ext;
-                    krsort($static::$aliases[root]);
+                    let root_alias = aliases[root],
+                        root_alias[alias] = path_ext;
+                    krsort(root_alias);
+                    let aliases[root] = root_alias;
                 }
             }
         } else {
-
-            if isset $static::$aliases[root] {
-                if is_array($static::$aliases[root]) {
-                    unset($static::$aliases[root][alias]);
+            if fetch root_alias, aliases[root] {
+                if typeof root_alias == "array"  {
+                    unset root_alias[alias];
+                    let aliases[root] = root_alias;
                 }
                 else {
-                    if pos === false {
-                        unset($static::$aliases[root]);
+                    if typeof pos == "boolean" {
+                        unset aliases[root];
                     }
                 }
             }
         }
+        let self::aliases = aliases; 
+
     }
 
     /**
@@ -277,15 +296,17 @@ class BaseYii
     public static function autoload(string className)
     {
         var classFile;
-        if isset $static::$classMap[className] {
-            let classFile = $static::$classMap[className];
-            if substr(classFile,0, 1) === "@" {
+        if fetch classFile, $static::classMap[className] {
+            if substr(classFile,0, 1) == "@" {
                 let classFile = $static::getAlias(classFile);
             }
         }
-        if className->index("\\") !== false {
+
+        var pos;
+        let pos = strpos(className, "\\");
+        if typeof pos != "boolean" {
             let classFile = $static::getAlias("@" . str_replace("\\", "/", className) . ".php", false);
-            if classFile === false || !is_file(classFile) {
+            if classFile == false || !is_file(classFile) {
                 return;
             }
         } else {

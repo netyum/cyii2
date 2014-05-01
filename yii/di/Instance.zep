@@ -102,10 +102,13 @@ class Instance
      * @return object the object referenced by the Instance, or `$reference` itself if it is an object.
      * @throws InvalidConfigException if the reference is invalid
      */
-    public static function ensure(reference, var type = null, container = null)
+    public static function ensure(reference, type = null, container = null)
     {
-        if reference instanceof type {
-            return reference;
+        var temp_reference;
+        if typeof reference == "object" {
+            if reference instanceof type {
+                return reference;
+            }
         }
         else {
             if empty reference {
@@ -114,17 +117,23 @@ class Instance
         }
 
         if typeof reference == "string" {
-            let reference = new $static(reference);
+            let temp_reference = new self(reference);
+        }
+
+        if typeof temp_reference == "object" {
+            let reference = temp_reference;
         }
 
         if reference instanceof Instance {
             var component;
             let component = reference->get(container);
-            if type === null {
+            if typeof type == "null" {
                 return component;
             }
-            if component instanceof type {
-                return component;
+            if typeof type == "object" || typeof type == "string" {
+                if component instanceof type {
+                    return component;
+                }
             } else {
                 throw new InvalidConfigException("\"" . reference->id . "\" refers to a " . get_class(component) . " component. ". type ." is expected.");
             }
@@ -143,11 +152,9 @@ class Instance
      */
     public function get(container = null)
     {
-        if container {
+        if typeof container == "object" {
             return container->get(this->id);
         }
-
-        
         if BaseYii::$app && BaseYii::$app->has(this->id) {
             return BaseYii::$app->get(this->id);
         } else {

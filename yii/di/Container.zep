@@ -140,7 +140,17 @@ class Container
      */
     public function get(string $class, params = [], config = [])
     {
-        var singleton;
+        var singletons, singleton, definitions;
+        let singletons = this->_singletons;
+        if typeof singletons != "array" {
+            let this->_singletons = [];
+        }
+
+        let definitions = this->_definitions;
+        if typeof definitions != "array" {
+            let this->_definitions = [];
+        }
+
         if fetch singleton, this->_singletons[$class] {
             // singleton
             return singleton;
@@ -160,7 +170,7 @@ class Container
             let $object = call_user_func(definition, this, params, config);
         }
         else {
-            if is_array(definition) {
+            if typeof definition == "array" {
                 var concrete;
                 let concrete = definition["class"];
                 unset definition["class"];

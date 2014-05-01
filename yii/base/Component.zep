@@ -593,22 +593,22 @@ class Component extends $Object
     public function trigger(string name, <Event> event = null)
     {
         this->ensureBehaviors();
-        if !empty this->_events[name] {
-            if (event === null) {
+        if isset this->_events[name] && !empty this->_events[name] {
+            if typeof event == "null" {
                 let event = new Event;
             }
-            if (event->sender === null) {
+            if typeof event->sender == "null" {
                 let event->sender = this;
             }
             let event->handled = false;
-            let event->name = $name;
+            let event->name = name;
 
             var handler;
             for handler in this->_events[name] {
                 let event->data = handler[1];
                 call_user_func(handler[0], event);
                 // stop further handling if the event is handled
-                if (event->handled) {
+                if event->handled == true {
                     return;
                 }
             }
