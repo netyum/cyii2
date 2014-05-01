@@ -92,7 +92,7 @@ class Event extends $Object
 
         let events[name][$class][] = elements,
             self::_events = events;
-
+ 
         return elements;
        
     }

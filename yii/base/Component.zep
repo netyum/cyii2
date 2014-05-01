@@ -526,11 +526,46 @@ class Component extends $Object
     public function on(string name, handler, data = null, bool append = true)
     {
         this->ensureBehaviors();
-        if append || empty this->_events[name] {
-            let this->_events[name][] = [handler, data];
-        } else {
-            array_unshift(this->_events[name], [handler, data]);
+
+        var events, event;
+
+        let events = this->_events;
+        if typeof events != "array" {
+            let events = [];
         }
+
+        var elements = [];
+        let elements[] = handler,
+            elements[] = data;
+
+        if append == true || !isset events[name] || empty events[name] {
+            if isset events[name] {
+                let event = events[name];
+            }
+            else {
+                let event = [];
+            }
+            if typeof event != "array" {
+                let event = [];
+            }
+            let event[] = elements,
+                events[name] = event;
+        } else {
+            if isset events[name] {
+                let event = events[name];
+            }
+            else {
+                let event = [];
+            }
+            
+            if typeof event != "array" {
+                let event = [];
+            }
+            array_unshift(event, elements);
+            let events[name] = event;
+        }
+
+        let this->_events = events;
     }
 
     /**
