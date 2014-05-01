@@ -127,21 +127,25 @@ class Instance
         if reference instanceof Instance {
             var component;
             let component = reference->get(container);
+
             if typeof type == "null" {
                 return component;
             }
-            if typeof type == "object" || typeof type == "string" {
-                if component instanceof type {
-                    return component;
-                }
+            if component instanceof type {
+                return component;
             } else {
-                throw new InvalidConfigException("\"" . reference->id . "\" refers to a " . get_class(component) . " component. ". type ." is expected.");
+                var class_name, message, id;
+                let class_name = get_class(component);
+                let id = reference->id;
+                let message = "\"" . id . "\" refers to a ";
+                let message .= class_name . " component. ". type ." is expected.";
+                throw new InvalidConfigException(message);
             }
         }
         var valueType;
         
         let valueType = typeof reference == "object" ? get_class(reference) : gettype(reference);
-        throw new InvalidConfigException("Invalid data type: $valueType. ". type . " is expected.");
+        throw new InvalidConfigException("Invalid data type: " . valueType . type . " is expected.");
     }
 
     /**
@@ -155,7 +159,7 @@ class Instance
         if typeof container == "object" {
             return container->get(this->id);
         }
-        if BaseYii::$app && BaseYii::$app->has(this->id) {
+        if typeof BaseYii::$app == "object" && BaseYii::$app->has(this->id) {
             return BaseYii::$app->get(this->id);
         } else {
             return BaseYii::$container->get(this->id);
