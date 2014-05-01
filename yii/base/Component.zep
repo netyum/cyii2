@@ -738,7 +738,7 @@ class Component extends $Object
     protected function attachBehaviorInternal(string name, behavior)
     {
         var temp_behavior, behaviors;
-        if !(behavior instanceof Behavior) {
+        if typeof behavior != "object" {
             let behavior = BaseYii::createObject(behavior);
         }
 

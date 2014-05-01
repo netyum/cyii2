@@ -47,7 +47,7 @@ class Event extends $Object
      */
     public data;
 
-    protected static _events;
+    public static _events;
 
     /**
      * Attaches an event handler to a class-level event.
@@ -75,9 +75,26 @@ class Event extends $Object
      * When the event handler is invoked, this data can be accessed via [[Event::data]].
      * @see off()
      */
-    public static function on($class, name, handler, data = null)
+    public static function on($class, string name, handler, data = null)
     {
-        let self::_events[name][$class->ltrim("\\")][] = [handler, data];
+        var events, elements = [];
+
+        let $class = ltrim($class, "\\");
+
+        let events = self::$_events;
+
+        if typeof events != "array" {
+            let events = [];
+        }
+
+        let elements[] = handler,
+            elements[] = data;
+
+        let events[name][$class][] = elements,
+            self::_events = events;
+
+        return elements;
+       
     }
 
     /**
@@ -92,28 +109,45 @@ class Event extends $Object
      * @return boolean whether a handler is found and detached.
      * @see on()
      */
-    public static function off($class, name, handler = null)
+    public static function off($class, string name, handler = null)
     {
-        $class->ltrim("\\");
-        if empty self::_events[name][$class] {
+        var events, event, temp_event, temp_event2, removed_temp_event;
+
+        let $class = ltrim($class, "\\");
+        if !isset self::_events[name][$class] || empty self::_events[name][$class] {
             return false;
         }
-        if handler === null {
-            unset(self::_events[name][$class]);
-
+        if typeof handler == "null" {
+            let events = self::_events,
+                event = events[name];
+            unset event[$class];
+            let events[name] = event,
+                self::_events = events;
             return true;
         } else {
-            var removed, i, event;
-
+            var removed, i;
             let removed = false;
-            for i, event in self::_events[name][$class] {
-                if event[0] === handler {
-                    unset(self::_events[name][$class][i]);
-                    let removed = true;
+            let events = self::_events,
+                event = events[name];
+
+            if isset event[$class] && typeof event[$class] == "array" {
+                for i, temp_event in event[$class] {
+                    if temp_event[0] == handler {
+
+                        let temp_event2 = event[$class];
+                        unset temp_event2[i];
+
+                        let event[$class] = temp_event2,
+                            removed = true;
+                    } 
                 }
             }
             if (removed) {
-                let self::_events[name][$class] = array_values(self::_events[name][$class]);
+                let removed_temp_event = event[$class],
+                    removed_temp_event = array_values(removed_temp_event),
+                    event[$class] = removed_temp_event,
+                    events[name] = event[$class],
+                    self::_events = events;
             }
 
             return removed;
@@ -128,20 +162,20 @@ class Event extends $Object
      * @param string $name the event name.
      * @return boolean whether there is any handler attached to the event.
      */
-    public static function hasHandlers($class, name) -> bool
+    public static function hasHandlers($class, string name) -> bool
     {
-        if empty self::_events[name] {
+        if !isset self::_events[name] || empty self::_events[name] {
             return false;
         }
 
-        if is_object($class) {
+        if typeof $class == "object" {
             let $class = get_class($class);
         } else {
-            $class->ltrim("\\");
+            let $class = ltrim($class, "\\");
         }
 
-        while $class != false {
-            if !empty self::_events[name][$class] {
+        while typeof $class != "boolean" {
+            if isset self::_events[name][$class] && !empty self::_events[name][$class] {
                 return true;
             }
             let $class = get_parent_class($class);
@@ -157,29 +191,30 @@ class Event extends $Object
      * @param string $name the event name.
      * @param Event $event the event parameter. If not set, a default [[Event]] object will be created.
      */
-    public static function trigger($class, name, event = null)
+    public static function trigger($class, string name, event = null)
     {
-        if empty self::_events[name] {
+        if !isset self::_events[name] || empty self::_events[name]{
             return;
         }
 
-        if event === null {
+        if typeof event == "null" {
             let event = new $static;
         }
-        let event->handled = false;
-        let event->name = $name;
 
-        if is_object($class) {
-            if event->sender === null {
+        let event->handled = false;
+        let event->name = name;
+
+        if typeof $class == "object" {
+            if typeof event->sender == "null" {
                 let event->sender = $class;
             }
             let $class = get_class($class);
         } else {
-            $class->ltrim("\\");
+            let $class = ltrim($class, "\\");
         }
 
-        while $class != false {
-            if !empty self::_events[name][$class] {
+        while typeof $class != "boolean" {
+            if isset self::_events[name][$class] && !empty self::_events[name][$class] {
                 var handler;
                 for handler in self::_events[name][$class] {
                     let event->data = handler[1];
