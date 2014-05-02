@@ -193,7 +193,13 @@ class Event extends $Object
      */
     public static function trigger($class, string name, event = null)
     {
-        if !isset self::_events[name] || empty self::_events[name]{
+        var events;
+        let events = self::_events;
+        if typeof events != "array" {
+            let events = [];
+        }
+
+        if !isset events[name] || empty events[name]{
             return;
         }
 
@@ -216,9 +222,11 @@ class Event extends $Object
         }
 
         while typeof $class != "boolean" {
-            if isset self::_events[name][$class] && !empty self::_events[name][$class] {
-                var handler, data, call;
-                for handler in self::_events[name][$class] {
+            if isset events[name][$class] && !empty events[name][$class] {
+                var handler, data, call, class_handers;
+                let class_handers = events[name][$class];
+
+                for handler in class_handers {
                     let data = handler[1],
                         call = handler[0];
 

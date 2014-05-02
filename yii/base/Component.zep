@@ -642,10 +642,13 @@ class Component extends $Object
         this->ensureEvents();
         this->ensureBehaviors();
 
-        var temp_event = null;
+        var events, temp_event = null;
+        let events = this->_events;
+        if typeof events != "array" {
+            let events = [];
+        }
         
-
-        if isset this->_events[name] && !empty this->_events[name] {
+        if isset events[name] && !empty events[name] {
             if typeof event == "null" {
                 let temp_event = new Event;
             }
@@ -661,7 +664,7 @@ class Component extends $Object
             let temp_event->name = name;
 
             var handler, data, call;
-            for handler in this->_events[name] {
+            for handler in events[name] {
                 if typeof handler == "array" && count(handler) == 2{
                     let data = handler[1],
                         call = handler[0];
