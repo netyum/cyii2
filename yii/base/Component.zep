@@ -662,7 +662,7 @@ class Component extends $Object
 
             var handler, data, call;
             for handler in this->_events[name] {
-                if typeof handler == "array" {
+                if typeof handler == "array" && count(handler) == 2{
                     let data = handler[1],
                         call = handler[0];
 
@@ -813,9 +813,6 @@ class Component extends $Object
      */
     protected function attachBehaviorInternal(string name, behavior)
     {
-        if this->_events != "array" {
-            let this->_events = [];
-        }
         var temp_behavior, behaviors;
         if typeof behavior != "object" {
             let behavior = BaseYii::createObject(behavior);
