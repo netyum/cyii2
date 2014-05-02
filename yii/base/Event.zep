@@ -196,7 +196,8 @@ class Event extends $Object
         if !isset self::_events[name] || empty self::_events[name]{
             return;
         }
-        var temp_event;
+
+        var temp_event = null;
         let temp_event = event;
         if typeof temp_event == "null" {
             let temp_event = new $static;

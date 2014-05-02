@@ -642,7 +642,8 @@ class Component extends $Object
         this->ensureEvents();
         this->ensureBehaviors();
 
-        var temp_event;
+        var temp_event = null;
+        
 
         if isset this->_events[name] && !empty this->_events[name] {
             if typeof event == "null" {
@@ -651,15 +652,20 @@ class Component extends $Object
             else {
                 let temp_event = event;
             }
+
             if typeof temp_event->sender == "null" {
                 let temp_event->sender = this;
             }
+
             let temp_event->handled = false;
             let temp_event->name = name;
 
             var handler, data, call;
             for handler in this->_events[name] {
+                echo (typeof handler);
+                echo "\n";
                 if typeof handler == "array" {
+                    echo "in component at handler\n";
                     let data = handler[1],
                         call = handler[0];
 
@@ -670,6 +676,7 @@ class Component extends $Object
                         return;
                     }
                 }
+                
             }
         }
         // invoke class-level attached handlers
