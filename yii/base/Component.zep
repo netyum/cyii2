@@ -662,10 +662,7 @@ class Component extends $Object
 
             var handler, data, call;
             for handler in this->_events[name] {
-                echo (typeof handler);
-                echo "\n";
                 if typeof handler == "array" {
-                    echo "in component at handler\n";
                     let data = handler[1],
                         call = handler[0];
 
