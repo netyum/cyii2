@@ -39,9 +39,9 @@
         "check-invalid-reads": false
     },
     "namespace": "yii",
-    "name": "yii",
-    "description": "",
-    "author": "",
+    "name": "cyii2",
+    "description": "php extension for yii framework",
+    "author": "syang",
     "version": "0.0.1",
     "verbose": false
 }
