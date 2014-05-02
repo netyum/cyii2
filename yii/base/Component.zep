@@ -594,19 +594,20 @@ class Component extends $Object
 
         this->ensureBehaviors();
 
-        if empty this->_events[name] {
+        if !isset this->_events[name] || empty this->_events[name] {
             return false;
         }
 
+        let events = this->_events;
+
         if typeof handler == "null" {
-            let events = this->_events;
-            unset events[name];
+            if isset events[name] {
+                unset events[name];
+            }
             let this->_events = events;
             return true;
         } else {
-            let removed = false,
-                events = this->_events;
-
+            let removed = false;
             var i, event;
             for i, event in this->_events[name] {
                 if event[0] == handler {
@@ -636,32 +637,43 @@ class Component extends $Object
      * @param string $name the event name
      * @param Event $event the event parameter. If not set, a default [[Event]] object will be created.
      */
-    public function trigger(string name, <Event> event = null)
+    public function trigger(string name, event = null)
     {
         this->ensureEvents();
         this->ensureBehaviors();
+
+        var temp_event;
+
         if isset this->_events[name] && !empty this->_events[name] {
             if typeof event == "null" {
-                let event = new Event;
+                let temp_event = new Event;
             }
-            if typeof event->sender == "null" {
-                let event->sender = this;
+            else {
+                let temp_event = event;
             }
-            let event->handled = false;
-            let event->name = name;
+            if typeof temp_event->sender == "null" {
+                let temp_event->sender = this;
+            }
+            let temp_event->handled = false;
+            let temp_event->name = name;
 
-            var handler;
+            var handler, data, call;
             for handler in this->_events[name] {
-                let event->data = handler[1];
-                call_user_func(handler[0], event);
-                // stop further handling if the event is handled
-                if event->handled == true {
-                    return;
+                if typeof handler == "array" {
+                    let data = handler[1],
+                        call = handler[0];
+
+                    let temp_event->data = data;
+                    call_user_func(call, temp_event);
+                    // stop further handling if the event is handled
+                    if temp_event->handled == true {
+                        return;
+                    }
                 }
             }
         }
         // invoke class-level attached handlers
-        Event::trigger(this, name, event);
+        Event::trigger(this, name, temp_event);
     }
 
     /**
@@ -772,9 +784,6 @@ class Component extends $Object
      */
     public function ensureBehaviors()
     {
-        if this->_events != "array" {
-            let this->_events = [];
-        }
         if typeof this->_behaviors == "null" {
             let this->_behaviors = [];
             
@@ -787,7 +796,7 @@ class Component extends $Object
 
     protected function ensureEvents()
     {
-        if this->_events == "null" {
+        if typeof this->_events == "null" {
             let this->_events = [];
         }
     }

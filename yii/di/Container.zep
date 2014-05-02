@@ -302,7 +302,7 @@ class Container
      */
     public function has(string $class) -> boolean
     {
-        return isset this->_singletons[$class];
+        return isset this->_definitions[$class];
     }
 
     /**

@@ -196,17 +196,18 @@ class Event extends $Object
         if !isset self::_events[name] || empty self::_events[name]{
             return;
         }
-
-        if typeof event == "null" {
-            let event = new $static;
+        var temp_event;
+        let temp_event = event;
+        if typeof temp_event == "null" {
+            let temp_event = new $static;
         }
 
-        let event->handled = false;
-        let event->name = name;
+        let temp_event->handled = false;
+        let temp_event->name = name;
 
         if typeof $class == "object" {
-            if typeof event->sender == "null" {
-                let event->sender = $class;
+            if typeof temp_event->sender == "null" {
+                let temp_event->sender = $class;
             }
             let $class = get_class($class);
         } else {
@@ -215,11 +216,14 @@ class Event extends $Object
 
         while typeof $class != "boolean" {
             if isset self::_events[name][$class] && !empty self::_events[name][$class] {
-                var handler;
+                var handler, data, call;
                 for handler in self::_events[name][$class] {
-                    let event->data = handler[1];
-                    call_user_func(handler[0], event);
-                    if (event->handled) {
+                    let data = handler[1],
+                        call = handler[0];
+
+                    let temp_event->data = data;
+                    call_user_func(call, temp_event);
+                    if temp_event->handled == true {
                         return;
                     }
                 }
