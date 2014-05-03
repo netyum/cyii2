@@ -47,7 +47,7 @@ class Event extends $Object
      */
     public data;
 
-    public static _events;
+    protected static _events;
 
     /**
      * Attaches an event handler to a class-level event.
@@ -195,9 +195,6 @@ class Event extends $Object
     {
         var events;
         let events = self::_events;
-        if typeof events != "array" {
-            let events = [];
-        }
 
         if !isset events[name] || empty events[name]{
             return;
