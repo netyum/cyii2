@@ -88,8 +88,8 @@ class Action extends Component
 
         let app = BaseYii::$app,
             requestedParams = app->requestedParams;
-            
-        BaseYii::trace('Running action: ' . get_class($this) . '::run()', __METHOD__);
+
+        BaseYii::trace("Running action: " . get_class(this) . "::run()", __METHOD__);
         if typeof requestedParams == "null" {
             let app->requestedParams = args;
             let BaseYii::$app = app;
