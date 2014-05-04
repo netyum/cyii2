@@ -40,7 +40,7 @@
     },
     "namespace": "yii",
     "name": "cyii2",
-    "description": "php extension for yii framework",
+    "description": "php extension for yii framework 2.0",
     "author": "syang",
     "version": "0.0.1",
     "verbose": false
