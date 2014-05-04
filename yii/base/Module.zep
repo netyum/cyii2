@@ -159,17 +159,20 @@ class Module extends ServiceLocator
      */
     public function getUniqueId()
     {
-        var id;
-        if typeof this->module != "null" {
-            let id = this->module->getUniqueId(),
-                id .= "/",
-                id .= this->id,
-                id = ltrim(id, "/");
+        var id, module, this_id, temp_id, unique_id, slash;
+        let module = this->module,
+            this_id = this->id,
+            slash = "/";
+
+        if typeof module != "null" {
+            let unique_id = module->getUniqueId(),
+                temp_id = unique_id . slash . this_id,
+                id = ltrim(temp_id, slash);
+            return id;
         }
         else {
-            let id = this->id;
+            return this_id;
         }
-        return id;
     }
 
     /**
@@ -508,7 +511,7 @@ class Module extends ServiceLocator
     public function runAction(string route, params = [])
     {
         var parts, id, controller, actionID, oldController, result;
-        let parts = $this->createController(route);
+        let parts = this->createController(route);
 
         if typeof parts == "array" {
             /** @var Controller $controller */
@@ -563,10 +566,11 @@ class Module extends ServiceLocator
         if route == "" {
             let route = this->defaultRoute;
         }
+        var slash, pos;
+        let slash = "/";
         // double slashes or leading/ending slashes may cause substr problem
-        let route = trim(route, "/");
+        let route = trim(route, slash);
 
-        var pos;
         let pos = strpos(route, "//");
 
         if typeof pos != "boolean" {
@@ -574,10 +578,10 @@ class Module extends ServiceLocator
         }
         var id;
 
-        let pos = strpos(route, "/");
+        let pos = strpos(route, slash);
         if typeof pos != "boolean" {
             var explodes;
-            let explodes = explode("/", route, 2);
+            let explodes = explode(slash, route, 2);
             let id = explodes[0],
                 route = explodes[1];
         } else {
@@ -604,24 +608,28 @@ class Module extends ServiceLocator
             return return_elements;
         }
 
-        let pos = strrpos(route, "/");
+        let pos = strrpos(route, slash);
         if typeof pos != "boolean" {
-            let id .= "/" . substr(route, 0, pos);
+            let id .= slash . substr(route, 0, pos);
             let route = substr(route, pos + 1);
         }
 
         let controller = this->createControllerByID(id);
 
         if typeof controller == "null" && route != "" {
-            let controller = this->createControllerByID(id . "/" . route);
+            let controller = this->createControllerByID(id . slash . route);
             let route = "";
         }
+
 
         if typeof controller == "null" {
             return false;
         }
         else {
-            let return_elements[0] = controller,
+            var temp_controller;
+            let temp_controller = controller;
+
+            let return_elements[0] = temp_controller,
                 return_elements[1] = route;
             return return_elements;
         }
@@ -660,7 +668,7 @@ class Module extends ServiceLocator
         let className = str_replace("-", " ", className),
             className = ucwords(className),
             className = str_replace(" ", "", className),
-            className .= "Controller",
+            className = className . "Controller",
             className = str_replace("/", "\\", prefix) . className,
             className = "\\" . className,
             className = this->controllerNamespace . className,
