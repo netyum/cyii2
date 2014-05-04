@@ -1,0 +1,16 @@
+#!/bin/sh
+zephir fullclean
+zephir generate
+
+#remove gen trait
+rm -rf ext/yii/base/arrayaccesstrait.c
+rm -rf ext/yii/base/arrayaccesstrait.h
+
+#copy trait
+cp -rf trait/base/* ext/yii/base/
+
+cd ext
+phpize
+./configure --with-php-config=php-config
+make && make install
+cd ..
