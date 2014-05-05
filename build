@@ -9,6 +9,14 @@ rm -rf ext/yii/base/arrayaccesstrait.h
 #copy trait
 cp -rf trait/base/* ext/yii/base/
 
+
+#remove file
+rm -rf ext/yii/helpers/arrayhelper.c
+rm -rf ext/yii/helpers/arrayhelper.h
+
+#copy fixed
+cp -rf fixed/helpers/* ext/yii/helpers/
+
 cd ext
 phpize
 ./configure --with-php-config=php-config
