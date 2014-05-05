@@ -57,7 +57,7 @@ class BaseYii
      */
     public static function getVersion()
     {
-        return "2.0.0-dev";
+        return "cyii 2.0.0-dev";
     }
 
     /**

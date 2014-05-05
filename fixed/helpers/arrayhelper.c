@@ -431,6 +431,7 @@ PHP_METHOD(yii_helpers_ArrayHelper, remove) {
                Z_SET_ISREF_P(array);
                zephir_array_fetch(&value, array, key, PH_NOISY | PH_SEPARATE TSRMLS_CC);
                zephir_array_unset(&array, key, 0);
+               Z_UNSET_ISREF_P(array);
                RETURN_CTOR(value);
           }
      }
@@ -853,6 +854,7 @@ PHP_METHOD(yii_helpers_ArrayHelper, multisort) {
 	ZVAL_STRING(&_3, "array_multisort", 0);
 	ZEPHIR_CALL_USER_FUNC_ARRAY(_13, &_3, args);
 	zephir_check_call_status();
+        Z_UNSET_ISREF_P(array);
 	ZEPHIR_MM_RESTORE();
 
 }
