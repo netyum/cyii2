@@ -1,21 +1,24 @@
 #!/bin/sh
-zephir fullclean
-zephir generate
 
-#remove gen trait
-rm -rf ext/yii/base/arrayaccesstrait.c
-rm -rf ext/yii/base/arrayaccesstrait.h
-
-#copy trait
-cp -rf trait/base/* ext/yii/base/
-
-
-#remove file
-rm -rf ext/yii/helpers/arrayhelper.c
-rm -rf ext/yii/helpers/arrayhelper.h
-
-#copy fixed
-cp -rf fixed/helpers/* ext/yii/helpers/
+if [ "$1" != "make" ]; then
+    zephir fullclean
+    zephir generate
+    
+    #remove gen trait
+    rm -rf ext/yii/base/arrayaccesstrait.c
+    rm -rf ext/yii/base/arrayaccesstrait.h
+    
+    #copy trait
+    cp -rf trait/base/* ext/yii/base/
+    
+    
+    #remove file
+    rm -rf ext/yii/helpers/arrayhelper.c
+    rm -rf ext/yii/helpers/arrayhelper.h
+    
+    #copy fixed
+    cp -rf fixed/helpers/* ext/yii/helpers/
+fi
 
 cd ext
 phpize
