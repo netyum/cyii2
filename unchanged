@@ -5,3 +5,4 @@ if [ "$1" == "" ]; then
 fi
 git update-index $arg ext/kernel/concat.c
 git update-index $arg ext/kernel/concat.h
+git update-index $arg ext/kernel/README.md
