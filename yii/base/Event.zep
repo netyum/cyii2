@@ -27,14 +27,14 @@ class Event extends $Object
      * @var string the event name. This property is set by [[Component::trigger()]] and [[trigger()]].
      * Event handlers may use this property to check what event it is handling.
      */
-    public name;
+    protected name;
     /**
      * @var object the sender of this event. If not set, this property will be
      * set as the object whose "trigger()" method is called.
      * This property may also be a `null` when this event is a
      * class-level event which is triggered in a static context.
      */
-    public sender;
+    protected sender;
     /**
      * @var boolean whether the event is handled. Defaults to false.
      * When a handler sets this to be true, the event processing will stop and

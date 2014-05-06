@@ -16,9 +16,12 @@ if [ "$1" != "make" ]; then
     #remove file
     rm -rf ext/yii/helpers/arrayhelper.c
     rm -rf ext/yii/helpers/arrayhelper.h
+    rm -rf /ext/yii/base/application.c
+    rm -rf /ext/yii/base/application.h
     
     #copy fixed
     cp -rf fixed/helpers/* ext/yii/helpers/
+    cp -rf fixed/base/* ext/yii/base/
 fi
 
 cd ext
