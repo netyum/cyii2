@@ -145,15 +145,18 @@ class ServiceLocator extends Component
             return component;
         }
 
-        var definition;
+        var definition, copy_definition, copy_object, $object;
         if fetch definition, this->_definitions[id] {
+            let copy_definition = definition,
             if typeof definition == "object" && !(definition instanceof \Closure) {
-                let this->_components[id] = definition;
+                    let components[id] = copy_definition,
+                        this->_components = components;
                 return definition;
             } else {
-                var $object;
-                let $object = BaseYii::createObject(definition),
-                    this->_components[id] = $object;
+                let $object = BaseYii::createObject(copy_definition),
+                    copy_object= $object,
+                    components[id] = copy_object,
+                    this->_components = components;
                 return $object;
             }
         }
