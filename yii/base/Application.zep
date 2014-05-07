@@ -187,9 +187,8 @@ abstract class Application extends Module
         this->registerErrorHandler(config);
         this->preInit(config);
 
-        var obj;
-
-        let obj = new Component(config);
+        BaseYii::configure(this, config);
+        this->init();
     }
 
     /**
@@ -324,10 +323,10 @@ abstract class Application extends Module
 
             if typeof bootstrap_component == "object" {
                 if bootstrap_component instanceof BootstrapInterface {
-                    BaseYii::trace("Bootstrap with " . get_class(component) . "::bootstrap()", __METHOD__);
+                    BaseYii::trace("Bootstrap with " . get_class(bootstrap_component) . "::bootstrap()", __METHOD__);
                     bootstrap_component->bootstrap(this);
                 } else {
-                    BaseYii::trace("Bootstrap with " . get_class(component), __METHOD__);
+                    BaseYii::trace("Bootstrap with " . get_class(bootstrap_component), __METHOD__);
                 }
             }
         }

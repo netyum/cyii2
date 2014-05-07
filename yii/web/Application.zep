@@ -172,7 +172,7 @@ class Application extends \yii\base\Application
     //protected function registerErrorHandler(&$config)
     protected function registerErrorHandler(config)
     {
-        if isset config["components"]["errorHandler"]["class"] {
+        if !isset config["components"]["errorHandler"]["class"] {
             let config["components"]["errorHandler"]["class"] = "yii\\web\\ErrorHandler";
         }
         parent::registerErrorHandler(config);

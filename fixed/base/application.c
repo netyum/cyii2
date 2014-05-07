@@ -229,8 +229,9 @@ ZEPHIR_INIT_CLASS(yii_base_Application) {
  */
 PHP_METHOD(yii_base_Application, __construct) {
 
+	zephir_nts_static zephir_fcall_cache_entry *_1 = NULL;
 	int ZEPHIR_LAST_CALL_STATUS;
-	zval *config = NULL, *_0, *obj;
+	zval *config = NULL, *_0;
 
 	ZEPHIR_MM_GROW();
 	zephir_fetch_params(1, 0, 1, &config);
@@ -249,9 +250,9 @@ PHP_METHOD(yii_base_Application, __construct) {
 	zephir_check_call_status();
 	ZEPHIR_CALL_METHOD(NULL, this_ptr, "preinit", NULL, config);
 	zephir_check_call_status();
-	ZEPHIR_INIT_VAR(obj);
-	object_init_ex(obj, yii_base_component_ce);
-	ZEPHIR_CALL_METHOD(NULL, obj, "__construct", NULL, config);
+	ZEPHIR_CALL_CE_STATIC(NULL, yii_baseyii_ce, "configure", &_1, this_ptr, config);
+	zephir_check_call_status();
+	ZEPHIR_CALL_METHOD(NULL, this_ptr, "init", NULL);
 	zephir_check_call_status();
 	ZEPHIR_MM_RESTORE();
 
@@ -527,7 +528,7 @@ PHP_METHOD(yii_base_Application, bootstrap) {
 		if (Z_TYPE_P(bootstrap_component) == IS_OBJECT) {
 			if (zephir_instance_of_ev(bootstrap_component, yii_base_bootstrapinterface_ce TSRMLS_CC)) {
 				ZEPHIR_INIT_NVAR(_13);
-				zephir_get_class(_13, component, 0 TSRMLS_CC);
+				zephir_get_class(_13, bootstrap_component, 0 TSRMLS_CC);
 				ZEPHIR_INIT_LNVAR(_14);
 				ZEPHIR_CONCAT_SVS(_14, "Bootstrap with ", _13, "::bootstrap()");
 				ZEPHIR_INIT_NVAR(_15);
@@ -539,7 +540,7 @@ PHP_METHOD(yii_base_Application, bootstrap) {
 				zephir_check_call_status();
 			} else {
 				ZEPHIR_INIT_NVAR(_15);
-				zephir_get_class(_15, component, 0 TSRMLS_CC);
+				zephir_get_class(_15, bootstrap_component, 0 TSRMLS_CC);
 				ZEPHIR_INIT_LNVAR(_25);
 				ZEPHIR_CONCAT_SV(_25, "Bootstrap with ", _15);
 				ZEPHIR_INIT_NVAR(_27);

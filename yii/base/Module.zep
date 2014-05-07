@@ -125,8 +125,10 @@ class Module extends ServiceLocator
      */
     public function __construct(string id, parent = null, config = [])
     {
-        let this->id = id,
-            this->module = parent;
+        let this->id = id;
+        if typeof parent != "null" {
+            let this->module = parent;
+        }
         parent::__construct(config);
     }
 
