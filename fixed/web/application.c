@@ -322,7 +322,7 @@ PHP_METHOD(yii_web_Application, registerErrorHandler) {
 
 	zephir_array_fetch_string(&_0, config, SL("components"), PH_NOISY | PH_READONLY TSRMLS_CC);
 	zephir_array_fetch_string(&_1, _0, SL("errorHandler"), PH_NOISY | PH_READONLY TSRMLS_CC);
-	if (zephir_array_isset_string(_1, SS("class"))) {
+	if (!zephir_array_isset_string(_1, SS("class"))) {
 		ZEPHIR_INIT_VAR(_2);
 		ZVAL_STRING(_2, "yii\\web\\ErrorHandler", 1);
 		zephir_array_update_multi(&config, &_2 TSRMLS_CC, SL("sss"), 6, SL("components"), SL("errorHandler"), SL("class"));
