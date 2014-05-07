@@ -18,6 +18,8 @@ if [ "$1" != "make" ]; then
     rm -rf ext/yii/helpers/arrayhelper.h
     rm -rf /ext/yii/base/application.c
     rm -rf /ext/yii/base/application.h
+    rm -rf /ext/yii/web/application.c
+    rm -rf /ext/yii/web/application.h
     
     #copy fixed
     cp -rf fixed/helpers/* ext/yii/helpers/
