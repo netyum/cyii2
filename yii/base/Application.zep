@@ -188,6 +188,8 @@ abstract class Application extends Module
         this->preInit(config);
 
         parent::__construct("", null, config);
+
+        print_r(this->_components);
     }
 
     /**
@@ -235,16 +237,23 @@ abstract class Application extends Module
             }
         }
 
-        var coreComponents, id, component;
+        var coreComponents, id, component, components, copy_component, components_id;
         let coreComponents = this->coreComponents();
-
+        let components = config["components"];
         // merge core components with custom components
         for id, component in coreComponents {
-            if !isset config["components"][id]  {
-                let config["components"][id] = component;
+            let copy_component = component;
+            if !isset components[id]  {
+                let components[id] = copy_component,
+                    config["components"] = components;
             } else {
-                if typeof config["components"][id] == "array" && !isset config["components"][id]["class"] {
-                    let config["components"][id]["class"] = component["class"];
+                if typeof components[id] == "array" {
+                    let components_id = components[id];
+                    if !isset components_id["class"] {
+                        let components_id["class"] = component["class"],
+                            components[id] = components_id,
+                            config["components"] = components;
+                    }
                 }
             }
         }

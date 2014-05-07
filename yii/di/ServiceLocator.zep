@@ -147,7 +147,7 @@ class ServiceLocator extends Component
 
         var definition, copy_definition, copy_object, $object;
         if fetch definition, this->_definitions[id] {
-            let copy_definition = definition,
+            let copy_definition = definition;
             if typeof definition == "object" {
                 if !(definition instanceof \Closure) {
                     let components[id] = copy_definition,
