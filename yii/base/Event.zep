@@ -77,7 +77,7 @@ class Event extends $Object
      */
     public static function on($class, string name, handler, data = null)
     {
-        var events, elements = [];
+        var events, elements = [], event, event_class;
 
         let $class = ltrim($class, "\\");
 
@@ -90,7 +90,11 @@ class Event extends $Object
         let elements[] = handler,
             elements[] = data;
 
-        let events[name][$class][] = elements,
+        let event = events[name],
+            event_class = event[$class],
+            event_class[] = elements,
+            event[$class] = event_class,
+            events[name] = event;
             self::_events = events;
  
         return elements;

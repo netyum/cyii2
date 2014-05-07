@@ -270,7 +270,7 @@ class Logger extends Component
         var timings = [], stack = [], i, log;
 
         for i, log in messages {
-            var token, level, category, timestamp, traces;
+            var token, level, category, timestamp, traces, timings_last;
             
             let token = log[0],
                 level = log[1],
@@ -283,15 +283,18 @@ class Logger extends Component
                 let stack[] = log;
             }
             if level == Logger::LEVEL_PROFILE_END {
-                var last;
+                var last, last_5;
                 let last = array_pop(stack);
                 if ( last !== null && $last[0] === token) {
-                    let timings[last[5]]["info"] = last[0],
-                        timings[last[5]]["category"] = last[2],
-                        timings[last[5]]["timestamp"] = last[3],
-                        timings[last[5]]["trace"] = last[4],
-                        timings[last[5]]["level"] = count(stack),
-                        timings[last[5]]["duration"] = timestamp - last[3];
+                    let last_5 = last[5],
+                        timings_last = timings[last_5],
+                        timings_last["info"] = last[0],
+                        timings_last["category"] = last[2],
+                        timings_last["timestamp"] = last[3],
+                        timings_last["trace"] = last[4],
+                        timings_last]["level"] = count(stack),
+                        timings_last["duration"] = timestamp - last[3],
+                        timings[last_5] = timings_last;
                 }
             }
         }

@@ -43,21 +43,21 @@ class ErrorException extends \ErrorException
         if function_exists("xdebug_get_function_stack") {
             let trace = array_slice(array_reverse(xdebug_get_function_stack()), 3, -1);
 
-            var key, frame, temp_trace;
+            var key, frame, temp_trace, trace_key;
             let temp_trace = trace;
             for key, frame in temp_trace {
-
+                let trace_key = trace[key];
                 if !isset frame["function"] {
-                    let trace[key]["funciton"] = "unknown";
+                    let trace_key["funciton"] = "unknown";
                 }
 
                 // XDebug < 2.1.1: http://bugs.xdebug.org/view.php?id=695
                 if !isset frame["type"] || frame["type"] == "static" {
-                    let trace[key]["type"] = "::";
+                    let trace_key["type"] = "::";
                 }
                 else {
                     if frame["type"] == "dynamic" {
-                        let trace[key]["type"] = "->";
+                        trace_key["type"] = "->";
                     }
                 }
 
@@ -65,8 +65,9 @@ class ErrorException extends \ErrorException
                     var temp_args;
 
                     let temp_args = frame["params"],
-                        trace[key]["args"] = temp_args;
+                        trace_key["args"] = temp_args;
                 }
+                trace[key] = trace_key;
             }
 
             var ref;
