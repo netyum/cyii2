@@ -94,7 +94,7 @@ class Event extends $Object
             event_class = event[$class],
             event_class[] = elements,
             event[$class] = event_class,
-            events[name] = event;
+            events[name] = event,
             self::_events = events;
  
         return elements;

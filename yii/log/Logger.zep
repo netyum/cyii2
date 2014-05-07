@@ -292,7 +292,7 @@ class Logger extends Component
                         timings_last["category"] = last[2],
                         timings_last["timestamp"] = last[3],
                         timings_last["trace"] = last[4],
-                        timings_last]["level"] = count(stack),
+                        timings_last["level"] = count(stack),
                         timings_last["duration"] = timestamp - last[3],
                         timings[last_5] = timings_last;
                 }

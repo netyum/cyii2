@@ -57,7 +57,7 @@ class ErrorException extends \ErrorException
                 }
                 else {
                     if frame["type"] == "dynamic" {
-                        trace_key["type"] = "->";
+                        let trace_key["type"] = "->";
                     }
                 }
 
@@ -67,7 +67,7 @@ class ErrorException extends \ErrorException
                     let temp_args = frame["params"],
                         trace_key["args"] = temp_args;
                 }
-                trace[key] = trace_key;
+                let trace[key] = trace_key;
             }
 
             var ref;

@@ -399,14 +399,16 @@ class ArrayHelper
      */
     public static function map(array $array, $from, $to, $group = null)
     {
-        var result = [], element, key, value, group_key;
+        var result = [], element, key, value, group_key, result_group_key;
         for element in $array {
             let key = $static::getValue(element, from),
                 value = $static::getValue(element, to);
 
             if typeof group != "null" {
                 let group_key = $static::getValue(element, group),
-                    result[group_key][key] = value;
+                    result_group_key = result[group_key],
+                    result_group_key[key] = value,
+                    result[group_key] = result_group_key;
             } else {
                 let result[key] = value;
             }
