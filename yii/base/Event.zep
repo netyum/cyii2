@@ -90,8 +90,15 @@ class Event extends $Object
         let elements[] = handler,
             elements[] = data;
 
-        let event = events[name],
-            event_class = event[$class],
+        if !isset events[name] {
+            let events[name] = [];
+        }
+        let event = events[name];
+        if !isset event[$class] {
+            let event[$class] = [];
+        }
+        
+        let event_class = event[$class],
             event_class[] = elements,
             event[$class] = event_class,
             events[name] = event,

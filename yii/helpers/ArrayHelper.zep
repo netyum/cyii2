@@ -405,8 +405,11 @@ class ArrayHelper
                 value = $static::getValue(element, to);
 
             if typeof group != "null" {
-                let group_key = $static::getValue(element, group),
-                    result_group_key = result[group_key],
+                let group_key = $static::getValue(element, group);
+                if !isset result[group_key] {
+                    let result[group_key] = [];
+                }
+                let result_group_key = result[group_key],
                     result_group_key[key] = value,
                     result[group_key] = result_group_key;
             } else {

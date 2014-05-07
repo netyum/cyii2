@@ -136,10 +136,10 @@ class Logger extends Component
             array_pop(ts); // remove the last trace since it would be the entry script, not very useful
             var trace;
             for trace in ts {
-                if (isset trace["file"]) && (isset trace["line"]) {
+                if isset trace["file"] && isset trace["line"] {
                     //&& strpos($trace['file'], YII_PATH) !== 0) {
-                    unset(trace["object"]);
-                    unset(trace["args"]);
+                    unset trace["object"];
+                    unset trace["args"];
                     let traces[] = trace;
                     if count >= this->traceLevel {
                         let count += 1;
@@ -286,8 +286,12 @@ class Logger extends Component
                 var last, last_5;
                 let last = array_pop(stack);
                 if ( last !== null && $last[0] === token) {
-                    let last_5 = last[5],
-                        timings_last = timings[last_5],
+                    let last_5 = last[5];
+                    if !isset timings[last_5] {
+                        let timings[last_5] = [];
+                    }
+
+                    let timings_last = timings[last_5],
                         timings_last["info"] = last[0],
                         timings_last["category"] = last[2],
                         timings_last["timestamp"] = last[3],

@@ -46,6 +46,9 @@ class ErrorException extends \ErrorException
             var key, frame, temp_trace, trace_key;
             let temp_trace = trace;
             for key, frame in temp_trace {
+                if !isset trace[key] {
+                    let trace[key] = [];
+                }
                 let trace_key = trace[key];
                 if !isset frame["function"] {
                     let trace_key["funciton"] = "unknown";

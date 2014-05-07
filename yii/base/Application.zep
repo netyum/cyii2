@@ -239,20 +239,21 @@ abstract class Application extends Module
 
         var coreComponents, id, component, components, copy_component, components_id;
         let coreComponents = this->coreComponents();
-        let components = config["components"];
-        // merge core components with custom components
-        for id, component in coreComponents {
-            let copy_component = component;
-            if !isset components[id]  {
-                let components[id] = copy_component,
-                    config["components"] = components;
-            } else {
-                if typeof components[id] == "array" {
-                    let components_id = components[id];
-                    if !isset components_id["class"] {
-                        let components_id["class"] = component["class"],
-                            components[id] = components_id,
-                            config["components"] = components;
+        if fetch components, config["components"] {
+            // merge core components with custom components
+            for id, component in coreComponents {
+                let copy_component = component;
+                if !isset components[id]  {
+                    let components[id] = copy_component,
+                        config["components"] = components;
+                } else {
+                    if typeof components[id] == "array" {
+                        let components_id = components[id];
+                        if !isset components_id["class"] {
+                            let components_id["class"] = component["class"],
+                                components[id] = components_id,
+                                config["components"] = components;
+                        }
                     }
                 }
             }
