@@ -187,8 +187,7 @@ abstract class Application extends Module
         this->registerErrorHandler(config);
         this->preInit(config);
 
-        BaseYii::configure(this, config);
-        this->init();
+        parent::__construct("", null, config);
     }
 
     /**

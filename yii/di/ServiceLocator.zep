@@ -216,28 +216,32 @@ class ServiceLocator extends Component
         let definitions = this->_definitions;
 
         if typeof components != "array" {
-            let this->_components = [];
+            let components = [];
         }
 
         if typeof definitions != "array" {
-            let this->_definitions = [];
+            let definitions = [];
         }
 
         if typeof definition == "null" {
-            unset this->_components[id];
-            unset this->_definitions[id];
+            unset components[id];
+            unset definitions[id];
+            let this->_components = components,
+                this->_definitions = definitions;
             return;
         }
 
         if typeof definition == "object" || is_callable(definition, true) {
             // an object, a class name, or a PHP callable
-            let this->_definitions[id] = definition;
+            let definitions[id] = definition,
+                this->_definitions = definitions;
         }
         else {
             if typeof definition == "array" {
                 // a configuration array
                 if isset definition["class"] {
-                    let this->_definitions[id] = definition;
+                    let definitions[id] = definition,
+                        this->_definitions = definitions;
                 } else {
                     string text = "class";
                     throw new InvalidConfigException("The configuration for the \"" . id . "\" component must contain a \"" . text ."\" element.");
